@@ -1,0 +1,22 @@
+@startuml
+title zim-服务上下线
+
+participant "Server" as server
+participant "Router" as router
+participant "Nacos" as nacos
+participant "Rocketmq" as rocketmq
+participant "Redis" as redis
+
+autonumber
+activate server
+server->server:im server启动
+
+server->rocketmq:创建server message topic消费者
+
+server->nacos:server 服务信息注册
+deactivate server
+
+activate router
+nacos-->router:nacos服务状态监听，服务节点发生变动做实时更新
+router->router:维护相关server message topic生产者
+@enduml

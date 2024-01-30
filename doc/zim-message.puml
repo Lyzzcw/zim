@@ -1,0 +1,41 @@
+@startuml
+title zim-消息时序图
+
+actor Sender as sender
+participant "Server" as server
+participant "Router" as router
+participant "Nacos" as nacos
+participant "Rocketmq" as rocketmq
+participant "Redis" as redis
+actor Receiver as receiver
+
+autonumber
+server->nacos:server启动，注册服务
+
+sender->router:申请建立连接websocket连接
+
+router->nacos:服务列表发现，按照指定策略分配server节点
+
+router-->sender:返回server节点相关连接信息
+
+sender->server:建立websocket连接
+activate server
+server->redis:保存sender相关连接信息
+
+sender->server:向receiver发送消息
+
+server->rocketmq:消息投递至message clean topic
+
+rocketmq->router:消费message clean topic消息
+
+router->router:进行消息清洗 序列化->格式化->持久化
+
+router->redis:查询receiver连接信息，获取receiver所在se  rver的message server topic
+
+router->rocketmq:消息投递至receiver所在server的 message server topic
+
+rocketmq->server:消费message server topic消息
+
+server->receiver:消息下发
+deactivate server
+@enduml
