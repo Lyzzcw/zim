@@ -26,7 +26,8 @@ public enum IMCmdType {
     HEART_BEAT(1,"心跳"),
     FORCE_LOGUT(2,"强制下线"),
     PRIVATE_MESSAGE(3,"私聊消息"),
-    GROUP_MESSAGE(4,"群发消息");
+    GROUP_MESSAGE(4,"群发消息"),
+    SYSTEM_MESSAGE(5,"系统消息");
 
 
     private final Integer code;

@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lyzzcw.work.common.domain.AbstractMessage;
+import lyzzcw.work.common.domain.MutualInfo;
 
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class WebSocketMessageProtocolDecoder extends MessageToMessageDecoder<Tex
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame, List<Object> list) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        AbstractMessage imSendInfo = objectMapper.readValue(textWebSocketFrame.text(), AbstractMessage.class);
-        list.add(imSendInfo);
+        MutualInfo<?> mutualInfo = objectMapper.readValue(textWebSocketFrame.text(), MutualInfo.class);
+        list.add(mutualInfo);
     }
 }

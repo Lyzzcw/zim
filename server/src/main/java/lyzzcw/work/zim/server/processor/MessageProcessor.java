@@ -2,6 +2,7 @@ package lyzzcw.work.zim.server.processor;
 
 import io.netty.channel.ChannelHandlerContext;
 import lyzzcw.work.common.domain.AbstractMessage;
+import lyzzcw.work.common.domain.MutualInfo;
 
 /**
  * 消息处理器
@@ -9,13 +10,16 @@ import lyzzcw.work.common.domain.AbstractMessage;
  * @author lzy
  * @date 2023/12/20
  */
-public interface MessageProcessor {
+public interface MessageProcessor<T> {
 
     /**
      * 处理数据
      */
-    default void process(ChannelHandlerContext ctx, AbstractMessage<?> message){
+    default void process(ChannelHandlerContext ctx, T info){
 
     }
 
+    default <T> T transform(Object obj){
+        return (T)obj;
+    }
 }

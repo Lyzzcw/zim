@@ -13,14 +13,14 @@ import lombok.val;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginMessage<T> extends AbstractMessage<T> {
+public class LoginMessage extends AbstractMessage{
 
     /**
      * 用户 ID
      */
     private Long userId;
 
-    private LoginMessage(Builder<T> builder) {
+    private LoginMessage(Builder builder) {
         setCmd(builder.cmd);
         setData(builder.data);
         setSendResult(builder.sendResult);
@@ -28,37 +28,37 @@ public class LoginMessage<T> extends AbstractMessage<T> {
     }
 
 
-    public static final class Builder<T> {
+    public static final class Builder {
         private Integer cmd;
-        private T data;
+        private Object data;
         private Boolean sendResult;
         private Long userId;
 
         public Builder() {
         }
 
-        public Builder<T> cmd(Integer val) {
+        public Builder cmd(Integer val) {
             cmd = val;
             return this;
         }
 
-        public Builder<T> data(T val) {
+        public Builder data(Object val) {
             data = val;
             return this;
         }
 
-        public Builder<T> sendResult(Boolean val) {
+        public Builder sendResult(Boolean val) {
             sendResult = val;
             return this;
         }
 
-        public Builder<T> userId(Long val) {
+        public Builder userId(Long val) {
             userId = val;
             return this;
         }
 
-        public LoginMessage<T> build() {
-            return new LoginMessage<T>(this);
+        public LoginMessage build() {
+            return new LoginMessage(this);
         }
     }
 }

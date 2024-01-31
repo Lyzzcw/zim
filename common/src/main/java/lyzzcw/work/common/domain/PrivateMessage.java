@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PrivateMessage<T> extends AbstractMessage<T>{
+public class PrivateMessage extends AbstractMessage{
 
     /**
      * 发消息的用户

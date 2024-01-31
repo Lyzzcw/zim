@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -49,6 +50,6 @@ public class UserChannelContextCache {
      * 获取连接
      */
     public static ChannelHandlerContext get(Long userId){
-        return connectionMap.get(userId);
+        return Objects.isNull(userId) ? null : connectionMap.get(userId);
     }
 }

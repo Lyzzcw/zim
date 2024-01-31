@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class AbstractMessage<T> {
+public abstract class AbstractMessage {
 
     /**
      * 命令类型 IMCmdType枚举的值
@@ -22,7 +22,7 @@ public abstract class AbstractMessage<T> {
     /**
      * 推送消息的数据
      */
-    private T data;
+    private Object data;
 
     /**
      * 是否需要回推发送结果,默认true

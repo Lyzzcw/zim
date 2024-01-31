@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemMessage<T> extends AbstractMessage<T>{
+public class SystemMessage extends AbstractMessage{
 
     /**
      * 接收消息的用户id

@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lyzzcw.work.common.domain.AbstractMessage;
+import lyzzcw.work.common.domain.MutualInfo;
 
 import java.util.List;
 
@@ -15,11 +16,11 @@ import java.util.List;
  * @author lzy
  * @date 2023/12/20
  */
-public class WebSocketMessageProtocolEncoder extends MessageToMessageEncoder<AbstractMessage> {
+public class WebSocketMessageProtocolEncoder extends MessageToMessageEncoder<MutualInfo> {
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, AbstractMessage imSendInfo, List<Object> list) throws Exception {
+    protected void encode(ChannelHandlerContext channelHandlerContext, MutualInfo mutualInfo, List<Object> list) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        String text = objectMapper.writeValueAsString(imSendInfo);
+        String text = objectMapper.writeValueAsString(mutualInfo);
         TextWebSocketFrame frame = new TextWebSocketFrame(text);
         list.add(frame);
     }

@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupMessage<T> extends AbstractMessage<T>{
+public class GroupMessage extends AbstractMessage{
 
     /**
      * 组 ID

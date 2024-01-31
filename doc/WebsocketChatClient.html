@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>WebSocket Chat</title>
+</head>
+<body>
+<script type="text/javascript">
+	var socket;
+	var userId;
+	var toUserId;
+	var messageContent;
+	var toGroupId;
+	var groupMessageContent;
+
+	function showLoginPopup() {
+		userId = prompt("请输入您的用户ID：", "");
+		if (userId) {
+			connectWebSocket();
+		} else {
+			alert("用户ID不能为空");
+		}
+	}
+
+	function connectWebSocket() {
+		if (!window.WebSocket) {
+			window.WebSocket = window.MozWebSocket;
+		}
+
+		if (window.WebSocket) {
+			socket = new WebSocket("ws://127.0.0.1:8878/im");
+			socket.onmessage = function (event) {
+				handleReceivedMessage(event.data);
+			};
+
+			socket.onopen = function (event) {
+				var ta = document.getElementById('responseText');
+				ta.value = "连接开启!";
+				sendLoginMessage();
+				// 定时发送心跳数据包
+				setInterval(function () {
+					if (socket.readyState == WebSocket.OPEN && userId) {
+						sendHeartbeat();
+					}
+				}, 5000);
+			};
+
+			socket.onclose = function (event) {
+				var ta = document.getElementById('responseText');
+				ta.value = ta.value + "连接被关闭";
+				showLoginPopup();
+			};
+		} else {
+			alert("你的浏览器不支持 WebSocket！");
+		}
+	}
+
+	function send(message) {
+		if (!window.WebSocket) {
+			return;
+		}
+		if (socket.readyState == WebSocket.OPEN) {
+			socket.send(message);
+		} else {
+			alert("连接没有开启.");
+		}
+	}
+
+	function sendLoginMessage() {
+		var loginMessage = {
+			cmd: 0,
+			info: {
+				cmd: 0,
+				data: "login",
+				sendResult: false,
+				userId: userId
+			}
+		};
+		send(JSON.stringify(loginMessage));
+	}
+
+	function sendHeartbeat() {
+		var heartbeatMessage = {
+			cmd: 1,
+			info: {
+				cmd: 1,
+				data: "ping",
+				sendResult: false
+			}
+		};
+		send(JSON.stringify(heartbeatMessage));
+	}
+
+	function sendPrivateMessage() {
+		var toUserIdInput = document.getElementsByName("toUserId")[0];
+		var messageContentInput = document.getElementsByName("messageContent")[0];
+
+		toUserId = toUserIdInput.value;
+		messageContent = messageContentInput.value;
+
+		if (messageContent && toUserId) {
+			var privateMessage = {
+				cmd: 3,
+				info: {
+					cmd: 3,
+					data: messageContent,
+					sendResult: false,
+					senderId: userId,
+					receiveId: toUserId,
+				}
+			};
+			send(JSON.stringify(privateMessage));
+
+			toUserIdInput.value = "";
+			messageContentInput.value = "";
+		} else {
+			alert("私聊消息内容不能为空，或未选择私聊对象");
+		}
+	}
+
+	function sendGroupMessage() {
+		var toGroupIdInput = document.getElementsByName("toGroupId")[0];
+		var groupMessageContentInput = document.getElementsByName("groupMessageContent")[0];
+
+		toGroupId = toGroupIdInput.value;
+		groupMessageContent = groupMessageContentInput.value;
+
+		if (groupMessageContent && toGroupId) {
+			var groupMessage = {
+				cmd: 4,
+				info: {
+					cmd: 4,
+					data: groupMessageContent,
+					sendResult: false,
+					senderId: userId,
+					groupId: toGroupId,
+				}
+			};
+			send(JSON.stringify(groupMessage));
+
+			toGroupIdInput.value = "";
+			groupMessageContentInput.value = "";
+		} else {
+			alert("群聊消息内容不能为空，或未选择群聊对象");
+		}
+	}
+
+	function getCurrentFormattedTime() {
+		var currentTime = new Date();
+		var year = currentTime.getFullYear();
+		var month = ("0" + (currentTime.getMonth() + 1)).slice(-2);
+		var day = ("0" + currentTime.getDate()).slice(-2);
+		var hours = ("0" + currentTime.getHours()).slice(-2);
+		var minutes = ("0" + currentTime.getMinutes()).slice(-2);
+		var seconds = ("0" + currentTime.getSeconds()).slice(-2);
+
+		return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+	}
+
+	function handleReceivedMessage(data) {
+		var messageObj = JSON.parse(data);
+		var ta = document.getElementById('responseText');
+
+		// 获取当前时间
+		var formattedTime = getCurrentFormattedTime();
+
+		// 根据cmd字段值进行展示逻辑
+		switch (messageObj.cmd) {
+			case 1:
+				// cmd值为1时，不展示
+				break;
+			case 3:
+				// cmd值为3时，字体颜色为红色
+				ta.innerHTML += '<span style="color: red;">[' + formattedTime + '] ' + data + '</span><br>';
+				break;
+			case 4:
+				// cmd值为4时，字体颜色为绿色
+				ta.innerHTML += '<span style="color: green;">[' + formattedTime + '] ' + data + '</span><br>';
+				break;
+			default:
+				// 其他情况正常展示
+				ta.innerHTML += '[' + formattedTime + '] ' + data + '<br>';
+		}
+	}
+
+	// 初始加载时弹出登录窗口
+	showLoginPopup();
+</script>
+<form onsubmit="return false;">
+	<h3>WebSocket 聊天室：</h3>
+	<div id="responseText" style="width: 800px; height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
+	<br>
+	<input type="text" name="toUserId" style="width: 150px" placeholder="消息接收人id">
+	<input type="text" name="messageContent" style="width: 300px" placeholder="输入私聊消息...">
+	<input type="button" value="发送私聊消息" onclick="
+        toUserId = this.form.toUserId.value;
+        messageContent = this.form.messageContent.value;
+        sendPrivateMessage()">
+	<br>
+	<input type="text" name="toGroupId" style="width: 150px" placeholder="消息群组id">
+	<input type="text" name="groupMessageContent" style="width: 300px" placeholder="输入群聊消息...">
+	<input type="button" value="发送群聊消息" onclick="
+        toGroupId = this.form.toGroupId.value;
+        groupMessageContent = this.form.groupMessageContent.value;
+        sendGroupMessage()">
+	<br>
+	<input type="button" onclick="document.getElementById('responseText').innerHTML=''" value="清空聊天记录">
+</form>
+<br>
+<br>
+</body>
+</html>
