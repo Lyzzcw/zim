@@ -1,7 +1,6 @@
 package lyzzcw.work.zim.server.processor.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 

@@ -27,7 +27,7 @@ public abstract class AbstractMessage {
     /**
      * 是否需要回推发送结果,默认true
      */
-    private Boolean sendResult = Boolean.FALSE;
+    private Boolean sendResult = Boolean.TRUE;
 
 
 }

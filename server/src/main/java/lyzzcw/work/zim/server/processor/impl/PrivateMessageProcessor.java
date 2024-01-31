@@ -6,8 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.domain.MutualInfo;
 import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.enums.IMCmdType;
+import lyzzcw.work.common.rocketmq.domain.MQConstants;
+import lyzzcw.work.common.rocketmq.domain.MessageInfo;
+import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
+import lyzzcw.work.component.common.json.jackson.JacksonUtil;
 import lyzzcw.work.zim.server.processor.MessageProcessor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -22,11 +28,33 @@ import java.util.Map;
 @Slf4j
 public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage> {
 
+    @Autowired
+    @Qualifier("messageRouteProducer")
+    private MessageQueueProducer messageQueueProducer;
 
     @Override
     public void process(ChannelHandlerContext ctx, PrivateMessage data) {
         log.info("received private message:{}",data);
-        responseWS(ctx,data);
+        //封装信息 扔到mq中
+        MessageInfo messageInfo = getMessageInfo(data);
+        messageQueueProducer.sendOrderMessage(messageInfo,data.getReceiveId().toString());
+        //返回客户端发送结果
+        if(data.getSendResult()){
+            responseWS(ctx,data);
+        }
+
+    }
+
+    private MessageInfo getMessageInfo(PrivateMessage data) {
+        MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
+                .cmd(IMCmdType.PRIVATE_MESSAGE.code())
+                .info(data)
+                .build();
+        MessageInfo messageInfo = new MessageInfo.Builder()
+                .topic(MQConstants.MESSAGE_TO_ROUTE_TOPIC)
+                .body(JacksonUtil.to(mutualInfo))
+                .build();
+        return messageInfo;
     }
 
     private void responseWS(ChannelHandlerContext ctx,PrivateMessage data){

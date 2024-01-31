@@ -74,7 +74,6 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
         //响应ws
         LoginMessage loginMessage = new LoginMessage.Builder()
                 .cmd(IMCmdType.LOGIN.code())
-                .sendResult(Boolean.FALSE)
                 .userId(userId)
                 .data("登录成功")
                 .build();

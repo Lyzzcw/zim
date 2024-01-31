@@ -30,7 +30,7 @@ public interface MessageQueueProducer {
      * @param messageInfo 留言信息
      * @return {@link SendResult}
      */
-    SendResult sendMessage(MessageInfo messageInfo) throws MQBrokerException, RemotingException, InterruptedException, MQClientException;
+    SendResult sendMessage(MessageInfo messageInfo);
 
     /**
      * 发送顺序消息
@@ -39,7 +39,7 @@ public interface MessageQueueProducer {
      * @param orderId     顺序编号
      * @return {@link SendResult}
      */
-    SendResult sendOrderMessage(MessageInfo messageInfo,String orderId) throws MQBrokerException, RemotingException, InterruptedException, MQClientException;
+    SendResult sendOrderMessage(MessageInfo messageInfo,String orderId);
 
     /**
      * 关闭

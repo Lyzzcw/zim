@@ -18,7 +18,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
  */
 public class MessageQueueProducerImpl implements MessageQueueProducer {
 
-    private  DefaultMQProducer producer ;
+    private DefaultMQProducer producer;
 
 
     @Override
@@ -30,15 +30,25 @@ public class MessageQueueProducerImpl implements MessageQueueProducer {
 
 
     @Override
-    public SendResult sendMessage(MessageInfo messageInfo) throws MQBrokerException, RemotingException, InterruptedException, MQClientException {
-        SendResult sendResult = this.producer.send(messageInfo);
-        return sendResult;
+    public SendResult sendMessage(MessageInfo messageInfo){
+        try {
+            SendResult sendResult = this.producer.send(messageInfo);
+            return sendResult;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
-    public SendResult sendOrderMessage(MessageInfo messageInfo, String orderId) throws MQBrokerException, RemotingException, InterruptedException, MQClientException {
-        SendResult sendResult = this.producer.send(messageInfo,new SelectMessageQueueByHash(), orderId);
-        return sendResult;
+    public SendResult sendOrderMessage(MessageInfo messageInfo, String orderId) {
+        try {
+            SendResult sendResult = this.producer.send(messageInfo, new SelectMessageQueueByHash(), orderId);
+            return sendResult;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

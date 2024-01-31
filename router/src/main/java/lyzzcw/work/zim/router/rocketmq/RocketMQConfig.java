@@ -7,9 +7,12 @@ import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.impl.MessageQueueConsumerImpl;
 import lyzzcw.work.common.rocketmq.service.impl.MessageQueueProducerImpl;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author lzy
@@ -22,6 +25,9 @@ public class RocketMQConfig {
     @Value("${rocketmq.namesvr}")
     private String namesvr;
 
+    @Autowired
+    private MessageRouteListener messageRouteListener;
+
     @Bean("messageRouteConsumer")
     public MessageQueueConsumer messageRouteProducer() throws MQClientException {
         MessageQueueConfig config = new MessageQueueConfig();
@@ -29,7 +35,7 @@ public class RocketMQConfig {
         config.setTopic(MQConstants.MESSAGE_TO_ROUTE_TOPIC);
         config.setGroup(MQConstants.MESSAGE_TO_ROUTE_GROUP);
         MessageQueueConsumer consumer = new MessageQueueConsumerImpl();
-        consumer.initOrderConsumer(config,new MessageRouteListener());
+        consumer.initOrderConsumer(config,messageRouteListener);
         return consumer;
     }
 }

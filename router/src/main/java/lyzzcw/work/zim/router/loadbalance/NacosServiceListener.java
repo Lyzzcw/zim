@@ -15,6 +15,7 @@ import lyzzcw.work.common.rocketmq.domain.MessageQueueConfig;
 import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.ProducerManager;
 import lyzzcw.work.common.rocketmq.service.impl.MessageQueueProducerImpl;
+import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -61,7 +62,8 @@ public class NacosServiceListener implements CommandLineRunner {
                         String serverId = instance.getMetadata().get("id");
                         serverIds.add(serverId);
                         if(!ProducerManager.getInstance().contains(serverId)){
-                            ProducerManager.getInstance().addProducer(serverId,messageSendProducer(serverId));
+                            ProducerManager.getInstance().addProducer(serverId,
+                                    RocketMQUtil.messageSendProducer(namesvr,serverId));
                         }
                     }
                     //关闭废弃producer
@@ -70,17 +72,6 @@ public class NacosServiceListener implements CommandLineRunner {
                 }
             }
         });
-    }
-
-
-    private MessageQueueProducer messageSendProducer(String id) throws MQClientException {
-        MessageQueueConfig config = new MessageQueueConfig();
-        config.setNamesvr(namesvr);
-        config.setTopic(MQConstants.MESSAGE_FROM_ROUTE_TOPIC.concat(id));
-        config.setGroup(MQConstants.MESSAGE_FROM_ROUTE_GROUP.concat(id));
-        MessageQueueProducer producer = new MessageQueueProducerImpl();
-        producer.initProducer(config);
-        return producer;
     }
 
     @Override
