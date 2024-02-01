@@ -4,6 +4,7 @@ package lyzzcw.work.zim.router.processor.factory;
 import lyzzcw.work.common.enums.IMCmdType;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.processor.impl.GroupMessageProcessor;
+import lyzzcw.work.zim.router.processor.impl.LoginProcessor;
 import lyzzcw.work.zim.router.processor.impl.PrivateMessageProcessor;
 import lyzzcw.work.zim.router.util.SpringContextHolder;
 
@@ -18,6 +19,9 @@ public class ProcessorFactory {
 
     public static MessageProcessor getProcessor(IMCmdType cmd){
         switch (cmd){
+            //登录
+            case LOGIN:
+                return SpringContextHolder.getApplicationContext().getBean(LoginProcessor.class);
             //单聊消息
             case PRIVATE_MESSAGE:
                 return SpringContextHolder.getApplicationContext().getBean(PrivateMessageProcessor.class);

@@ -8,11 +8,17 @@ import lyzzcw.work.common.constants.IMConstants;
 import lyzzcw.work.common.domain.HeartbeatMessage;
 import lyzzcw.work.common.domain.LoginMessage;
 import lyzzcw.work.common.domain.MutualInfo;
+import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.enums.IMCmdType;
+import lyzzcw.work.common.rocketmq.domain.MQConstants;
+import lyzzcw.work.common.rocketmq.domain.MessageInfo;
+import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
+import lyzzcw.work.component.common.json.jackson.JacksonUtil;
 import lyzzcw.work.component.redis.cache.distribute.DistributeCacheService;
 import lyzzcw.work.zim.server.cache.UserChannelContextCache;
 import lyzzcw.work.zim.server.processor.MessageProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +39,10 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
     private String serverId;
 
     @Autowired
+    @Qualifier("messageRouteProducer")
+    private MessageQueueProducer messageQueueProducer;
+
+    @Autowired
     private DistributeCacheService distributedCacheService;
 
     @Override
@@ -42,6 +52,11 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
             log.warn("LoginProcessor.process|转化后的loginInfo为空");
             return;
         }
+
+        //封装信息 扔到mq中
+        MessageInfo messageInfo = getMessageInfo(data);
+        messageQueueProducer.sendOrderMessage(messageInfo,data.getUserId().toString());
+
         Long userId = data.getUserId();
         log.info("LoginProcessor.process|用户登录, userId:{}", userId);
         ChannelHandlerContext channelCtx = UserChannelContextCache.get(userId);
@@ -54,8 +69,9 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
                     .userId(userId)
                     .data("您已在其他地方登录，将被强制下线")
                     .build();
-            this.responseWS(ctx,loginMessage);
+            this.responseWS(channelCtx,loginMessage);
             log.info("LoginProcessor.process|异地登录，强制下线，userid:{}", userId);
+            channelCtx.close();
         }
         //缓存用户和Channel的关系
         UserChannelContextCache.add(userId, ctx);
@@ -98,4 +114,15 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
         return BeanUtil.fillBeanWithMap(map, new LoginMessage(), false);
     }
 
+    private MessageInfo getMessageInfo(LoginMessage data) {
+        MutualInfo<LoginMessage> mutualInfo = new MutualInfo.Builder<LoginMessage>()
+                .cmd(IMCmdType.LOGIN.code())
+                .info(data)
+                .build();
+        MessageInfo messageInfo = new MessageInfo.Builder()
+                .topic(MQConstants.MESSAGE_TO_ROUTE_TOPIC)
+                .body(JacksonUtil.to(mutualInfo))
+                .build();
+        return messageInfo;
+    }
 }
