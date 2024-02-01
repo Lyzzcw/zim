@@ -22,4 +22,8 @@ public interface MessageProcessor<T> {
     default <T> T transform(Object obj){
         return (T)obj;
     }
+
+    default void sendToClient(T info){
+
+    }
 }

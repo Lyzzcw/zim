@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lyzzcw.work.zim.router.infrastructure.mapper.ImUserMapper">
+  <resultMap id="BaseResultMap" type="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="head_image" jdbcType="VARCHAR" property="headImage" />
+    <result column="head_image_thumb" jdbcType="VARCHAR" property="headImageThumb" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="sex" jdbcType="TINYINT" property="sex" />
+    <result column="type" jdbcType="SMALLINT" property="type" />
+    <result column="signature" jdbcType="VARCHAR" property="signature" />
+    <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_name, nick_name, head_image, head_image_thumb, password, sex, type, signature, 
+    last_login_time, created_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from im_user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from im_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    insert into im_user (id, user_name, nick_name, 
+      head_image, head_image_thumb, password, 
+      sex, type, signature, 
+      last_login_time, created_time)
+    values (#{id,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
+      #{headImage,jdbcType=VARCHAR}, #{headImageThumb,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=TINYINT}, #{type,jdbcType=SMALLINT}, #{signature,jdbcType=VARCHAR}, 
+      #{lastLoginTime,jdbcType=TIMESTAMP}, #{createdTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    insert into im_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="headImage != null">
+        head_image,
+      </if>
+      <if test="headImageThumb != null">
+        head_image_thumb,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="signature != null">
+        signature,
+      </if>
+      <if test="lastLoginTime != null">
+        last_login_time,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImage != null">
+        #{headImage,jdbcType=VARCHAR},
+      </if>
+      <if test="headImageThumb != null">
+        #{headImageThumb,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=TINYINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="signature != null">
+        #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLoginTime != null">
+        #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    update im_user
+    <set>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="headImage != null">
+        head_image = #{headImage,jdbcType=VARCHAR},
+      </if>
+      <if test="headImageThumb != null">
+        head_image_thumb = #{headImageThumb,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=TINYINT},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=SMALLINT},
+      </if>
+      <if test="signature != null">
+        signature = #{signature,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLoginTime != null">
+        last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    update im_user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      head_image = #{headImage,jdbcType=VARCHAR},
+      head_image_thumb = #{headImageThumb,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=TINYINT},
+      type = #{type,jdbcType=SMALLINT},
+      signature = #{signature,jdbcType=VARCHAR},
+      last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+      created_time = #{createdTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

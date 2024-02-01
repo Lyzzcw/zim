@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lyzzcw.work.zim.router.infrastructure.mapper.ImFriendMapper">
+  <resultMap id="BaseResultMap" type="lyzzcw.work.zim.router.infrastructure.entity.ImFriend">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="friend_id" jdbcType="BIGINT" property="friendId" />
+    <result column="friend_nick_name" jdbcType="VARCHAR" property="friendNickName" />
+    <result column="friend_head_image" jdbcType="VARCHAR" property="friendHeadImage" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, friend_id, friend_nick_name, friend_head_image, created_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from im_friend
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from im_friend
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImFriend">
+    insert into im_friend (id, user_id, friend_id, 
+      friend_nick_name, friend_head_image, created_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{friendId,jdbcType=BIGINT}, 
+      #{friendNickName,jdbcType=VARCHAR}, #{friendHeadImage,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImFriend">
+    insert into im_friend
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="friendId != null">
+        friend_id,
+      </if>
+      <if test="friendNickName != null">
+        friend_nick_name,
+      </if>
+      <if test="friendHeadImage != null">
+        friend_head_image,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="friendId != null">
+        #{friendId,jdbcType=BIGINT},
+      </if>
+      <if test="friendNickName != null">
+        #{friendNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="friendHeadImage != null">
+        #{friendHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImFriend">
+    update im_friend
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="friendId != null">
+        friend_id = #{friendId,jdbcType=BIGINT},
+      </if>
+      <if test="friendNickName != null">
+        friend_nick_name = #{friendNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="friendHeadImage != null">
+        friend_head_image = #{friendHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImFriend">
+    update im_friend
+    set user_id = #{userId,jdbcType=BIGINT},
+      friend_id = #{friendId,jdbcType=BIGINT},
+      friend_nick_name = #{friendNickName,jdbcType=VARCHAR},
+      friend_head_image = #{friendHeadImage,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

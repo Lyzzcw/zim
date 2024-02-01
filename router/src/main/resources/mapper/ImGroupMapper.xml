@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lyzzcw.work.zim.router.infrastructure.mapper.ImGroupMapper">
+  <resultMap id="BaseResultMap" type="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="owner_id" jdbcType="BIGINT" property="ownerId" />
+    <result column="head_image" jdbcType="VARCHAR" property="headImage" />
+    <result column="head_image_thumb" jdbcType="VARCHAR" property="headImageThumb" />
+    <result column="notice" jdbcType="VARCHAR" property="notice" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="deleted" jdbcType="TINYINT" property="deleted" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, owner_id, head_image, head_image_thumb, notice, remark, deleted, created_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from im_group
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from im_group
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    insert into im_group (id, name, owner_id, 
+      head_image, head_image_thumb, notice, 
+      remark, deleted, created_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{ownerId,jdbcType=BIGINT}, 
+      #{headImage,jdbcType=VARCHAR}, #{headImageThumb,jdbcType=VARCHAR}, #{notice,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT}, #{createdTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    insert into im_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="ownerId != null">
+        owner_id,
+      </if>
+      <if test="headImage != null">
+        head_image,
+      </if>
+      <if test="headImageThumb != null">
+        head_image_thumb,
+      </if>
+      <if test="notice != null">
+        notice,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="deleted != null">
+        deleted,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerId != null">
+        #{ownerId,jdbcType=BIGINT},
+      </if>
+      <if test="headImage != null">
+        #{headImage,jdbcType=VARCHAR},
+      </if>
+      <if test="headImageThumb != null">
+        #{headImageThumb,jdbcType=VARCHAR},
+      </if>
+      <if test="notice != null">
+        #{notice,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null">
+        #{deleted,jdbcType=TINYINT},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    update im_group
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerId != null">
+        owner_id = #{ownerId,jdbcType=BIGINT},
+      </if>
+      <if test="headImage != null">
+        head_image = #{headImage,jdbcType=VARCHAR},
+      </if>
+      <if test="headImageThumb != null">
+        head_image_thumb = #{headImageThumb,jdbcType=VARCHAR},
+      </if>
+      <if test="notice != null">
+        notice = #{notice,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null">
+        deleted = #{deleted,jdbcType=TINYINT},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    update im_group
+    set name = #{name,jdbcType=VARCHAR},
+      owner_id = #{ownerId,jdbcType=BIGINT},
+      head_image = #{headImage,jdbcType=VARCHAR},
+      head_image_thumb = #{headImageThumb,jdbcType=VARCHAR},
+      notice = #{notice,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=TINYINT},
+      created_time = #{createdTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

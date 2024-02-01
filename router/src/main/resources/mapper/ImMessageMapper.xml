@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lyzzcw.work.zim.router.infrastructure.mapper.ImMessageMapper">
+  <resultMap id="BaseResultMap" type="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="message_code" jdbcType="BIGINT" property="messageCode" />
+    <result column="cmd_type" jdbcType="TINYINT" property="cmdType" />
+    <result column="send_id" jdbcType="BIGINT" property="sendId" />
+    <result column="recv_id" jdbcType="BIGINT" property="recvId" />
+    <result column="message_type" jdbcType="TINYINT" property="messageType" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="send_nick_name" jdbcType="VARCHAR" property="sendNickName" />
+    <result column="at_user_ids" jdbcType="VARCHAR" property="atUserIds" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, message_code, cmd_type, send_id, recv_id, message_type, status, send_nick_name, 
+    at_user_ids, send_time
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from im_message
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from im_message
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    insert into im_message (id, message_code, cmd_type, 
+      send_id, recv_id, message_type, 
+      status, send_nick_name, at_user_ids, 
+      send_time, content)
+    values (#{id,jdbcType=BIGINT}, #{messageCode,jdbcType=BIGINT}, #{cmdType,jdbcType=TINYINT}, 
+      #{sendId,jdbcType=BIGINT}, #{recvId,jdbcType=BIGINT}, #{messageType,jdbcType=TINYINT}, 
+      #{status,jdbcType=TINYINT}, #{sendNickName,jdbcType=VARCHAR}, #{atUserIds,jdbcType=VARCHAR}, 
+      #{sendTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    insert into im_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="messageCode != null">
+        message_code,
+      </if>
+      <if test="cmdType != null">
+        cmd_type,
+      </if>
+      <if test="sendId != null">
+        send_id,
+      </if>
+      <if test="recvId != null">
+        recv_id,
+      </if>
+      <if test="messageType != null">
+        message_type,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="sendNickName != null">
+        send_nick_name,
+      </if>
+      <if test="atUserIds != null">
+        at_user_ids,
+      </if>
+      <if test="sendTime != null">
+        send_time,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="messageCode != null">
+        #{messageCode,jdbcType=BIGINT},
+      </if>
+      <if test="cmdType != null">
+        #{cmdType,jdbcType=TINYINT},
+      </if>
+      <if test="sendId != null">
+        #{sendId,jdbcType=BIGINT},
+      </if>
+      <if test="recvId != null">
+        #{recvId,jdbcType=BIGINT},
+      </if>
+      <if test="messageType != null">
+        #{messageType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="sendNickName != null">
+        #{sendNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="atUserIds != null">
+        #{atUserIds,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null">
+        #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    update im_message
+    <set>
+      <if test="messageCode != null">
+        message_code = #{messageCode,jdbcType=BIGINT},
+      </if>
+      <if test="cmdType != null">
+        cmd_type = #{cmdType,jdbcType=TINYINT},
+      </if>
+      <if test="sendId != null">
+        send_id = #{sendId,jdbcType=BIGINT},
+      </if>
+      <if test="recvId != null">
+        recv_id = #{recvId,jdbcType=BIGINT},
+      </if>
+      <if test="messageType != null">
+        message_type = #{messageType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="sendNickName != null">
+        send_nick_name = #{sendNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="atUserIds != null">
+        at_user_ids = #{atUserIds,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null">
+        send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    update im_message
+    set message_code = #{messageCode,jdbcType=BIGINT},
+      cmd_type = #{cmdType,jdbcType=TINYINT},
+      send_id = #{sendId,jdbcType=BIGINT},
+      recv_id = #{recvId,jdbcType=BIGINT},
+      message_type = #{messageType,jdbcType=TINYINT},
+      status = #{status,jdbcType=TINYINT},
+      send_nick_name = #{sendNickName,jdbcType=VARCHAR},
+      at_user_ids = #{atUserIds,jdbcType=VARCHAR},
+      send_time = #{sendTime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    update im_message
+    set message_code = #{messageCode,jdbcType=BIGINT},
+      cmd_type = #{cmdType,jdbcType=TINYINT},
+      send_id = #{sendId,jdbcType=BIGINT},
+      recv_id = #{recvId,jdbcType=BIGINT},
+      message_type = #{messageType,jdbcType=TINYINT},
+      status = #{status,jdbcType=TINYINT},
+      send_nick_name = #{sendNickName,jdbcType=VARCHAR},
+      at_user_ids = #{atUserIds,jdbcType=VARCHAR},
+      send_time = #{sendTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

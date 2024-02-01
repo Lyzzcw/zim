@@ -24,5 +24,12 @@ public interface MQConstants {
      * 来自路由组消息
      */
     String MESSAGE_FROM_ROUTE_GROUP = "MESSAGE_FROM_ROUTE_GROUP_";
-
+    /**
+     * 消息持久性组
+     */
+    String MESSAGE_PERSISTENCE_GROUP = "MESSAGE_PERSISTENCE_GROUP";
+    /**
+     * 消息持久性主题
+     */
+    String MESSAGE_PERSISTENCE_TOPIC = "MESSAGE_PERSISTENCE_TOPIC";
 }

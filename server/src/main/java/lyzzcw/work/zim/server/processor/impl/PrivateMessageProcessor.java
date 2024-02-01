@@ -10,6 +10,7 @@ import lyzzcw.work.common.rocketmq.domain.MQConstants;
 import lyzzcw.work.common.rocketmq.domain.MessageInfo;
 import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
+import lyzzcw.work.zim.server.cache.UserChannelContextCache;
 import lyzzcw.work.zim.server.processor.MessageProcessor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,6 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         if(data.getSendResult()){
             responseWS(ctx,data);
         }
-
     }
 
     private MessageInfo getMessageInfo(PrivateMessage data) {
@@ -73,5 +73,19 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     public PrivateMessage transform(Object obj) {
         Map<?, ?> map = (Map<?, ?>) obj;
         return BeanUtil.fillBeanWithMap(map, new PrivateMessage(), false);
+    }
+
+    @Override
+    public void sendToClient(PrivateMessage data){
+        ChannelHandlerContext ctx = UserChannelContextCache.get(data.getReceiveId());
+        if(ctx != null){
+            MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
+                    .cmd(IMCmdType.PRIVATE_MESSAGE.code())
+                    .info(data)
+                    .build();
+            ctx.channel().writeAndFlush(mutualInfo);
+        }else {
+            log.info("send to user({}) offline",data.getReceiveId());
+        }
     }
 }

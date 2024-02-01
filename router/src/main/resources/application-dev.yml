@@ -8,6 +8,26 @@ logging:
   config: classpath:logback-spring.xml
 
 spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    password: root
+    username: root
+    url: jdbc:mysql://localhost:3306/zim?useUnicode=true&characterEncoding=utf8&useSSL=false
+    # 连接池配置
+    druid:
+      # 初始化大小，最小，最大
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位毫秒
+      time-between-eviction-runs-millis: 60000
+      # 配置一个连接在池中最小生存时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM user
   redis:
     database: 0
     host: 127.0.0.1
@@ -35,3 +55,14 @@ distribute:
 
 rocketmq:
   namesvr: 127.0.0.1:9876
+mybatis:
+  #  classpath:/com/*/*/mapper/*Mapper.xml 放在resources目录下classpath:/mapper/**.xml
+  mapper-locations: classpath:/mapper/**.xml
+#  type-aliases-package: com.example.demo.domain
+#  configuration:
+#  开启这个的作用是可以让数据库中的id与pojo中的id对应
+#  map-underscore-to-camel-case: true
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+

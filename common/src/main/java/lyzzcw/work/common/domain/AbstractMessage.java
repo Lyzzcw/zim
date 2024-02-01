@@ -20,6 +20,11 @@ public abstract class AbstractMessage {
     private Integer cmd;
 
     /**
+     * 消息码
+     */
+    private Long messageCode;
+
+    /**
      * 推送消息的数据
      */
     private Object data;

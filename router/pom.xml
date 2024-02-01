@@ -18,6 +18,10 @@
         <logback.version>1.2.6</logback.version>
         <lombok.version>1.18.16</lombok.version>
         <rocketmq.version>4.9.0</rocketmq.version>
+        <mybaits.version>2.0.0</mybaits.version>
+        <pagehelper.version>1.4.0</pagehelper.version>
+        <jdbc.version>5.1.30</jdbc.version>
+        <durid.version>1.2.8</durid.version>
     </properties>
 
     <dependencyManagement>
@@ -147,6 +151,49 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!-- register end -->
+
+        <!-- mybatis begin -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybaits.version}</version>
+        </dependency>
+        <!-- 分页插件 移除mybatis 与baomidou冲突-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>${pagehelper.version}</version>
+            <exclusions>
+                <!--使用spring boot2整合 pagehelper-spring-boot-starter必须排除一下依赖
+		        因为pagehelper-spring-boot-starter也已经在pom依赖了mybatis与mybatis-spring
+		        所以会与mybatis-plus-boot-starter中的mybatis与mybatis-spring发生冲突-->
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis-spring</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${durid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${jdbc.version}</version>
+        </dependency>
+        <!--java8 日期类型与mybatis映射 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-typehandlers-jsr310</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <!-- mybatis end -->
     </dependencies>
 
 </project>
