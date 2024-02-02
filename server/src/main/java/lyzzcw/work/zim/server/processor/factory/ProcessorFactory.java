@@ -3,10 +3,7 @@ package lyzzcw.work.zim.server.processor.factory;
 
 import lyzzcw.work.common.enums.IMCmdType;
 import lyzzcw.work.zim.server.processor.MessageProcessor;
-import lyzzcw.work.zim.server.processor.impl.GroupMessageProcessor;
-import lyzzcw.work.zim.server.processor.impl.HeartbeatProcessor;
-import lyzzcw.work.zim.server.processor.impl.LoginProcessor;
-import lyzzcw.work.zim.server.processor.impl.PrivateMessageProcessor;
+import lyzzcw.work.zim.server.processor.impl.*;
 import lyzzcw.work.zim.server.util.SpringContextHolder;
 
 /**
@@ -31,6 +28,9 @@ public class ProcessorFactory {
             //群聊消息
             case GROUP_MESSAGE:
                 return SpringContextHolder.getApplicationContext().getBean(GroupMessageProcessor.class);
+            //系统消息
+            case SYSTEM_MESSAGE:
+                return SpringContextHolder.getApplicationContext().getBean(SystemMessageProcessor.class);
             default:
                 return null;
 

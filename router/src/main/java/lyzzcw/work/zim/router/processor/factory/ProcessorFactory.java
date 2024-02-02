@@ -6,6 +6,7 @@ import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.processor.impl.GroupMessageProcessor;
 import lyzzcw.work.zim.router.processor.impl.LoginProcessor;
 import lyzzcw.work.zim.router.processor.impl.PrivateMessageProcessor;
+import lyzzcw.work.zim.router.processor.impl.SystemMessageProcessor;
 import lyzzcw.work.zim.router.util.SpringContextHolder;
 
 
@@ -28,6 +29,9 @@ public class ProcessorFactory {
             //群聊消息
             case GROUP_MESSAGE:
                 return SpringContextHolder.getApplicationContext().getBean(GroupMessageProcessor.class);
+            //系统消息
+            case SYSTEM_MESSAGE:
+                return SpringContextHolder.getApplicationContext().getBean(SystemMessageProcessor.class);
             default:
                 return null;
 

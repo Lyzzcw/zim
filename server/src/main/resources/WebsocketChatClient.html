@@ -176,6 +176,47 @@
 		}
 	}
 
+	function sendSystemMessage() {
+		var systemToUserIdInput = document.getElementsByName("systemToUserId")[0];
+		var systemMessageContentInput = document.getElementsByName("systemMessageContent")[0];
+
+		var toUserId = systemToUserIdInput.value;
+		var messageContent = systemMessageContentInput.value;
+
+		if (messageContent && toUserId) {
+			// 将参数添加到URL
+			var apiUrl = 'http://127.0.0.1:8090/router/system/notice' +
+					'?userId=' + toUserId +
+					'&message=' + messageContent;
+
+			// 使用fetch发送GET请求
+			fetch(apiUrl, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error('HTTP请求失败');
+						}
+						return response.json();
+					})
+					.then(data => {
+						// 处理服务器返回的数据
+						console.log('成功发送系统消息:', data);
+					})
+					.catch(error => {
+						console.error('发送系统消息时发生错误:', error);
+					});
+
+			systemToUserIdInput.value = "";
+			systemMessageContentInput.value = "";
+		} else {
+			alert("系统消息内容不能为空，或未选择接收人");
+		}
+	}
+
 	function getCurrentFormattedTime() {
 		var currentTime = new Date();
 		var year = currentTime.getFullYear();
@@ -208,6 +249,10 @@
 				// cmd值为4时，字体颜色为绿色
 				ta.innerHTML += '<span style="color: green;">[' + formattedTime + '] ' + data + '</span><br>';
 				break;
+			case 5:
+				// cmd值为5时，字体颜色为蓝色
+				ta.innerHTML += '<span style="color: blue;">[' + formattedTime + '] ' + data + '</span><br>';
+				break;
 			default:
 				// 其他情况正常展示
 				ta.innerHTML += '[' + formattedTime + '] ' + data + '<br>';
@@ -234,6 +279,11 @@
         toGroupId = this.form.toGroupId.value;
         groupMessageContent = this.form.groupMessageContent.value;
         sendGroupMessage()">
+	<br>
+	<!-- 在表单中添加发送系统消息的输入框和按钮 -->
+	<input type="text" name="systemToUserId" style="width: 150px" placeholder="接收人userId">
+	<input type="text" name="systemMessageContent" style="width: 300px" placeholder="输入系统消息...">
+	<input type="button" value="发送系统消息" onclick="sendSystemMessage()">
 	<br>
 	<input type="button" onclick="document.getElementById('responseText').innerHTML=''" value="清空聊天记录">
 </form>
