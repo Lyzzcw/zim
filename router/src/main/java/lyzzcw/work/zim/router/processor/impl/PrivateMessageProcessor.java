@@ -66,7 +66,7 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
 
             producer.sendOrderMessage(getMessageInfo(data,serverId),data.getReceiveId().toString());
         }else{
-            //todo 离线消息逻辑
+            //消息逻辑
             log.info("private message receiver offLine:{}",data.getReceiveId());
             String offLineRedisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
                     IMConstants.IM_USER_OFFLINE_MESSAGE, data.getReceiveId().toString());

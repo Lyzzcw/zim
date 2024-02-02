@@ -28,5 +28,5 @@ public class GroupMessage extends AbstractMessage{
     /**
      * 接收群消息的用户
      */
-    private List<Long> receiveIds;
+    private Long receiveId;
 }

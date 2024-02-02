@@ -61,10 +61,11 @@ mybatis:
   #  classpath:/com/*/*/mapper/*Mapper.xml 放在resources目录下classpath:/mapper/**.xml
   mapper-locations: classpath:/mapper/**.xml
 #  type-aliases-package: com.example.demo.domain
-#  configuration:
-#  开启这个的作用是可以让数据库中的id与pojo中的id对应
-#  map-underscore-to-camel-case: true
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  configuration:
+    # 启动结果集自动映射（NONE,PARTIAL,FULL）
+    auto-mapping-behavior: partial
+    # 驼峰映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 

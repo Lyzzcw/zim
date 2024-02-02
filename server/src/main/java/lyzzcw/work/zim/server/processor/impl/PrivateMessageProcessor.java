@@ -69,10 +69,7 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
 
     private void responseWS(ChannelHandlerContext ctx,PrivateMessage data){
         // 响应WS的数据
-        PrivateMessage response = new PrivateMessage();
-        BeanUtils.copyProperties(data,response);
-        response.setData("发送成功");
-        ctx.channel().writeAndFlush(getMutualInfo(response));
+        ctx.channel().writeAndFlush(getMutualInfo(data));
     }
 
     @Override
