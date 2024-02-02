@@ -15,6 +15,7 @@ import lyzzcw.work.common.rocketmq.service.ProducerManager;
 import lyzzcw.work.component.common.id.SnowflakeIdWorker;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
 import lyzzcw.work.component.redis.cache.distribute.redis.RedisDistributeCacheService;
+import lyzzcw.work.component.redis.cache.redis.list.RedisListService;
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
@@ -42,6 +43,8 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     @Autowired
     @Qualifier("persistenceProducer")
     private MessageQueueProducer persistenceProducer;
+    @Resource
+    private RedisListService redisListService;
 
     @Override
     public void process(PrivateMessage data) {
@@ -65,6 +68,9 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         }else{
             //todo 离线消息逻辑
             log.info("private message receiver offLine:{}",data.getReceiveId());
+            String offLineRedisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
+                    IMConstants.IM_USER_OFFLINE_MESSAGE, data.getReceiveId().toString());
+            redisListService.leftPush(offLineRedisKey,JacksonUtil.to(getMutualInfo(data)));
         }
 
     }
@@ -84,15 +90,20 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     }
 
     private MessageInfo getMessageInfo(PrivateMessage data,String serverId) {
-        MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
-                .cmd(IMCmdType.PRIVATE_MESSAGE.code())
-                .info(data)
-                .build();
+        MutualInfo<PrivateMessage> mutualInfo = getMutualInfo(data);
         MessageInfo messageInfo = new MessageInfo.Builder()
                 .topic(MQConstants.MESSAGE_FROM_ROUTE_TOPIC.concat(serverId))
                 .body(JacksonUtil.to(mutualInfo))
                 .build();
         return messageInfo;
+    }
+
+    private MutualInfo<PrivateMessage> getMutualInfo(PrivateMessage data) {
+        MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
+                .cmd(IMCmdType.PRIVATE_MESSAGE.code())
+                .info(data)
+                .build();
+        return mutualInfo;
     }
 
     @Override

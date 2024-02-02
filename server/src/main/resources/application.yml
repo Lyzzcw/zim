@@ -1,5 +1,6 @@
 server:
   registryAddress: 127.0.0.1:8848?namespace=35a965ca-970d-412b-aa59-ed2bbcfcc22e
+  serverAddr: ws://127.0.0.1:8878/im
   id: 1
   version: 1.0.0
   group: lyzzcw
@@ -45,4 +46,4 @@ websocket:
     count: 10
 
 rocketmq:
-  namesvr: 127.0.0.1:9876
+  namesvr: 192.168.3.48:9876

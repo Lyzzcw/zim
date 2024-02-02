@@ -16,10 +16,41 @@
 	function showLoginPopup() {
 		userId = prompt("请输入您的用户ID：", "");
 		if (userId) {
-			connectWebSocket();
+			// 获取WebSocket连接地址
+			getWebSocketAddress();
 		} else {
 			alert("用户ID不能为空");
 		}
+	}
+
+	function getWebSocketAddress() {
+		// 通过异步请求获取WebSocket连接地址
+		// 请替换成你的后台接口地址
+		var apiUrl = "http://127.0.0.1:8090/router/login/discovery";
+
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", apiUrl, true);
+		xhr.onreadystatechange = function () {
+
+			console.log("ReadyState:", xhr.readyState);
+			console.log("Status:", xhr.status);
+
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var responseJson = JSON.parse(xhr.responseText);
+					// 判断 code 是否为 200
+					if (responseJson.code === 200) {
+						var wsAddress = responseJson.data;
+						connectWebSocket(wsAddress);
+					} else {
+						alert("获取WebSocket连接地址失败：" + responseJson.message);
+					}
+				} else {
+					alert("获取WebSocket连接地址失败，HTTP状态码：" + xhr.status);
+				}
+			}
+		};
+		xhr.send();
 	}
 
 	function connectWebSocket() {

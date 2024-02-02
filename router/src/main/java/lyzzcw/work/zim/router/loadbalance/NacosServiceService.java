@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.listener.Event;
 import com.alibaba.nacos.api.naming.listener.EventListener;
 import com.alibaba.nacos.api.naming.listener.NamingEvent;
 import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.alibaba.nacos.client.naming.core.Balancer;
 import com.google.api.client.util.Lists;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +21,26 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
+ * NACOS 服务 服务
+ *
  * @author lzy
  * @version 1.0
  * Date: 2024/1/30 16:30
  * Description: No Description
+ * @date 2024/02/02
  */
 @Component
 @Slf4j
-public class NacosServiceListener implements CommandLineRunner {
+public class NacosServiceService implements CommandLineRunner {
+
+    private static final String SERVER_NAME = "zim-server";
 
     @Value("${spring.cloud.nacos.discovery.server-addr}")
     private String serverAddr;
@@ -41,15 +49,36 @@ public class NacosServiceListener implements CommandLineRunner {
     @Value("${rocketmq.namesvr}")
     private String namesvr;
 
-    public void start() throws NacosException {
+    private NamingService namingService;
+
+
+    /**
+     * 发现
+     *
+     * @return {@link String}
+     * @throws NacosException Nacos 异常
+     */
+    public String discovery() throws NacosException {
+        Instance instance = LoadBalancerUtil.getWSInstance(
+                this.namingService.getAllInstances(SERVER_NAME));
+        Assert.notNull(instance, "not found instance for zim-server");
+        return instance.getIp();
+    }
+
+    /**
+     * 监听服务注册信息
+     *
+     * @throws NacosException Nacos 异常
+     */
+    public void listener() throws NacosException {
         // 创建Nacos服务实例
         Properties properties = new Properties();
         properties.put("serverAddr", serverAddr);
         properties.put("namespace", namespace);
-        NamingService namingService = NamingFactory.createNamingService(properties);
+        this.namingService = NamingFactory.createNamingService(properties);
 
         // 注册监听器，实现监听逻辑
-        namingService.subscribe("zim-server", new EventListener() {
+        this.namingService.subscribe(SERVER_NAME, new EventListener() {
             @SneakyThrows
             @Override
             public void onEvent(Event event) {
@@ -76,6 +105,6 @@ public class NacosServiceListener implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        this.start();
+        this.listener();
     }
 }

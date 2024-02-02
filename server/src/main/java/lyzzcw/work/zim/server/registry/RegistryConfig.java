@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RegistryConfig {
 
-    @Value("${server.registryAddress}")
-    private String registryAddress;
+    @Value("${server.serverAddr}")
+    private String serverAddr;
     @Value("${spring.application.name}")
     private String name;
     @Value("${server.id}")
@@ -31,6 +31,6 @@ public class RegistryConfig {
 
     @Bean
     public ServiceMeta initRegistryInfo(){
-        return new ServiceMeta(id,this.name,this.version,this.registryAddress,this.port,this.group,this.weight);
+        return new ServiceMeta(id,this.name,this.version,this.serverAddr,this.port,this.group,this.weight);
     }
 }

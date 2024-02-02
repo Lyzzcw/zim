@@ -1,0 +1,17 @@
+@startuml
+title zim-离线消息时序图
+
+actor User as user
+participant "Server" as server
+participant "Redis" as redis
+
+autonumber
+user -> server:登录请求
+server -> user:握手成功
+activate server
+server -> redis:检查离线队列是否有消息
+redis --> server:离线队列列表
+server -> server:组装离线消息
+server -> user: 下发消息
+deactivate server
+@enduml

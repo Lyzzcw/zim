@@ -19,11 +19,15 @@ public interface MessageProcessor<T> {
 
     }
 
+    default boolean OfflineMessageProcess(ChannelHandlerContext ctx,MutualInfo info){
+        return true;
+    }
+
     default <T> T transform(Object obj){
         return (T)obj;
     }
 
-    default void sendToClient(T info){
+    default void sendToReceiver(T info){
 
     }
 }

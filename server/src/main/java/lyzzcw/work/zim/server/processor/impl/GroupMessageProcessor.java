@@ -39,11 +39,16 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage>{
         GroupMessage response = new GroupMessage();
         BeanUtils.copyProperties(data,response);
         response.setData("发送成功");
+        MutualInfo<GroupMessage> mutualInfo = getMutualInfo(response);
+        ctx.channel().writeAndFlush(mutualInfo);
+    }
+
+    private MutualInfo<GroupMessage> getMutualInfo(GroupMessage response) {
         MutualInfo<GroupMessage> mutualInfo = new MutualInfo.Builder<GroupMessage>()
                 .cmd(IMCmdType.GROUP_MESSAGE.code())
                 .info(response)
                 .build();
-        ctx.channel().writeAndFlush(mutualInfo);
+        return mutualInfo;
     }
 
     @Override

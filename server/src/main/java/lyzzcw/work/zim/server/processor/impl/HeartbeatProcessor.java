@@ -65,11 +65,16 @@ public class HeartbeatProcessor implements MessageProcessor<HeartbeatMessage> {
         heartbeatMessage.setCmd(IMCmdType.HEART_BEAT.code());
         heartbeatMessage.setData("pong");
         heartbeatMessage.setUserId(userId);
+        MutualInfo<HeartbeatMessage> mutualInfo = getMutualInfo(heartbeatMessage);
+        ctx.channel().writeAndFlush(mutualInfo);
+    }
+
+    private MutualInfo<HeartbeatMessage> getMutualInfo(HeartbeatMessage heartbeatMessage) {
         MutualInfo<HeartbeatMessage> mutualInfo = new MutualInfo.Builder<HeartbeatMessage>()
                 .cmd(IMCmdType.HEART_BEAT.code())
                 .info(heartbeatMessage)
                 .build();
-        ctx.channel().writeAndFlush(mutualInfo);
+        return mutualInfo;
     }
 
     @Override

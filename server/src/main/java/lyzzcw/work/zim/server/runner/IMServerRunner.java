@@ -6,6 +6,7 @@ import lyzzcw.work.zim.registry.api.RegistryService;
 import lyzzcw.work.zim.registry.api.config.RegistryConfig;
 import lyzzcw.work.zim.registry.api.config.ServiceMeta;
 import lyzzcw.work.zim.spi.loader.ExtensionLoader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,8 @@ public class IMServerRunner implements CommandLineRunner {
     private IMNettyServer imNettyServer;
     @Resource
     private ServiceMeta serviceMeta;
-
+    @Value("${server.registryAddress}")
+    private String registryAddress;
     /**
      * 判断服务是否准备完毕
      */
@@ -45,7 +47,7 @@ public class IMServerRunner implements CommandLineRunner {
         //注册服务
         if(isReady()){
             log.info("registry info :{}",serviceMeta);
-            RegistryConfig registryConfig = new RegistryConfig(serviceMeta.getServiceAddr(),
+            RegistryConfig registryConfig = new RegistryConfig(registryAddress,
                     "nacos","random");
             RegistryService registryService = ExtensionLoader.getExtension(RegistryService.class,
                     registryConfig.getRegistryType());

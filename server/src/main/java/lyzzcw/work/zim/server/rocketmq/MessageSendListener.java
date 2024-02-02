@@ -34,7 +34,7 @@ public class MessageSendListener implements MessageListenerOrderly {
                     log.info("message send listener :{}",mutualInfo);
                     MessageProcessor<?> processor = ProcessorFactory.getProcessor(Objects.requireNonNull(IMCmdType.fromCode(mutualInfo.getCmd())));
                     Assert.notNull(processor, "not available processor for message");
-                    processor.sendToClient(processor.transform(mutualInfo.getInfo()));
+                    processor.sendToReceiver(processor.transform(mutualInfo.getInfo()));
                 }
         );
         return ConsumeOrderlyStatus.SUCCESS;

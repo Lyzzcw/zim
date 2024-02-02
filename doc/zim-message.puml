@@ -30,9 +30,11 @@ rocketmq->router:消费message clean topic消息
 
 router->router:进行消息清洗 序列化->格式化->持久化
 
-router->redis:查询receiver连接信息，获取receiver所在se  rver的message server topic
+router->redis:查询receiver连接信息，获取receiver所在server的message server topic
 
-router->rocketmq:消息投递至receiver所在server的 message server topic
+router-->redis:receiver离线则将消息暂存至离线队列
+
+router->rocketmq:receiver在线消息投递至receiver所在server的 message server topic
 
 rocketmq->server:消费message server topic消息
 

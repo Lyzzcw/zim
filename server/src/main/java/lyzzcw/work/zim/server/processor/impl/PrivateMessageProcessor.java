@@ -45,11 +45,14 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         }
     }
 
+    @Override
+    public boolean OfflineMessageProcess(ChannelHandlerContext ctx,MutualInfo info){
+        log.info("send offline message:{}",info);
+        return ctx.writeAndFlush(info).isSuccess();
+    }
+
     private MessageInfo getMessageInfo(PrivateMessage data) {
-        MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
-                .cmd(IMCmdType.PRIVATE_MESSAGE.code())
-                .info(data)
-                .build();
+        MutualInfo<PrivateMessage> mutualInfo = getMutualInfo(data);
         MessageInfo messageInfo = new MessageInfo.Builder()
                 .topic(MQConstants.MESSAGE_TO_ROUTE_TOPIC)
                 .body(JacksonUtil.to(mutualInfo))
@@ -57,16 +60,19 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         return messageInfo;
     }
 
+    private MutualInfo<PrivateMessage> getMutualInfo(PrivateMessage data) {
+        return new MutualInfo.Builder<PrivateMessage>()
+                    .cmd(IMCmdType.PRIVATE_MESSAGE.code())
+                    .info(data)
+                    .build();
+    }
+
     private void responseWS(ChannelHandlerContext ctx,PrivateMessage data){
         // 响应WS的数据
         PrivateMessage response = new PrivateMessage();
         BeanUtils.copyProperties(data,response);
         response.setData("发送成功");
-        MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
-                .cmd(IMCmdType.PRIVATE_MESSAGE.code())
-                .info(response)
-                .build();
-        ctx.channel().writeAndFlush(mutualInfo);
+        ctx.channel().writeAndFlush(getMutualInfo(response));
     }
 
     @Override
@@ -76,14 +82,10 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     }
 
     @Override
-    public void sendToClient(PrivateMessage data){
+    public void sendToReceiver(PrivateMessage data){
         ChannelHandlerContext ctx = UserChannelContextCache.get(data.getReceiveId());
         if(ctx != null){
-            MutualInfo<PrivateMessage> mutualInfo = new MutualInfo.Builder<PrivateMessage>()
-                    .cmd(IMCmdType.PRIVATE_MESSAGE.code())
-                    .info(data)
-                    .build();
-            ctx.channel().writeAndFlush(mutualInfo);
+            ctx.channel().writeAndFlush(getMutualInfo(data));
         }else {
             log.info("send to user({}) offline",data.getReceiveId());
         }

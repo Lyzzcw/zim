@@ -58,6 +58,10 @@ public class IMConstants {
      * 用户ID所连接的IM-server的ID
      */
     public final static String IM_USER_SERVER_ID = "im:user:server_id";
+    /**
+     * 用户离线消息
+     */
+    public final static String IM_USER_OFFLINE_MESSAGE = "im:user:offline_message";
 
     /*************************Channel连接相关***********************/
 
