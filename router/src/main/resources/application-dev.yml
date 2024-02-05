@@ -43,6 +43,12 @@ spring:
         max-idle: 8
         min-idle: 0
         max-wait: 5000
+  minio:
+    endpoint: http://192.168.3.48:9000
+    visitPath: http://192.168.3.48:9000
+    accessKey: lyzzcw
+    secretKey: lyzzcw123
+    region: acer-win
 cache:
   type:
     local: guava

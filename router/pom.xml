@@ -22,6 +22,7 @@
         <pagehelper.version>1.4.0</pagehelper.version>
         <jdbc.version>5.1.30</jdbc.version>
         <durid.version>1.2.8</durid.version>
+        <okhttp3.version>4.10.0</okhttp3.version>
     </properties>
 
     <dependencyManagement>
@@ -33,6 +34,14 @@
                 <version>${spring.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- fixme -->
+            <!--在项目的根pom中，引入okhttp，指定版本，这么做会覆盖spring-boot-dependencies的版本设置
+            强制指定版本，优先级高于spring-boot-dependencies-->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp3.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
@@ -194,6 +203,14 @@
             <version>1.0.2</version>
         </dependency>
         <!-- mybatis end -->
+
+        <!--minio -begin-->
+        <dependency>
+            <groupId>lyzzcw.work.component</groupId>
+            <artifactId>minio-oss-parents</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--minio -end-->
     </dependencies>
 
 </project>

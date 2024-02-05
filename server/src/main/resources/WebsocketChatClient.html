@@ -125,55 +125,120 @@
 	function sendPrivateMessage() {
 		var toUserIdInput = document.getElementsByName("toUserId")[0];
 		var messageContentInput = document.getElementsByName("messageContent")[0];
+		var imageInput = document.getElementsByName("imageInput")[0];
 
-		toUserId = toUserIdInput.value;
-		messageContent = messageContentInput.value;
+		var toUserId = toUserIdInput.value;
+		var messageContent = messageContentInput.value;
+		var messageType = 0; // 默认为文本消息
 
-		if (messageContent && toUserId) {
-			var privateMessage = {
-				cmd: 3,
-				info: {
-					cmd: 3,
-					data: messageContent,
-					sendResult: true,
-					senderId: userId,
-					receiveId: toUserId,
-				}
+		// 检查是否上传了图片
+		if (imageInput.files.length > 0) {
+			var imageFile = imageInput.files[0];
+			var reader = new FileReader();
+
+			reader.onloadend = function () {
+				// 图片转换为Base64编码
+				var imageData = reader.result.split(',')[1]; // 去掉前缀部分
+				messageType = 1; // 设置为图片消息
+				sendMessage(toUserId, messageContent, messageType, imageData);
 			};
-			send(JSON.stringify(privateMessage));
 
-			toUserIdInput.value = "";
-			messageContentInput.value = "";
+			reader.readAsDataURL(imageFile);
 		} else {
-			alert("私聊消息内容不能为空，或未选择私聊对象");
+			// 没有上传图片，发送文本消息
+			sendMessage(toUserId, messageContent, messageType);
 		}
+
+		// 清空输入框
+		toUserIdInput.value = "";
+		messageContentInput.value = "";
+		imageInput.value = "";
+	}
+
+	function sendMessage(toUserId, messageContent, messageType, imageData) {
+		// 构建消息对象
+		var message = {
+			cmd: 3,  // 使用3表示私聊消息
+			info: {
+				cmd: 3,
+				sendResult: true,
+				senderId: userId,
+				receiveId: toUserId,
+				messageType: messageType,
+			}
+		};
+
+		// 根据消息类型设置 data 字段
+		if (messageType === 0) {
+			// 文本消息
+			message.info.data = messageContent;
+		} else if (messageType === 1) {
+			// 图片消息
+			message.info.data = imageData;
+		}
+
+		// 发送消息
+		send(JSON.stringify(message));
 	}
 
 	function sendGroupMessage() {
 		var toGroupIdInput = document.getElementsByName("toGroupId")[0];
 		var groupMessageContentInput = document.getElementsByName("groupMessageContent")[0];
+		var groupImageInput = document.getElementsByName("groupImageInput")[0];
 
 		toGroupId = toGroupIdInput.value;
 		groupMessageContent = groupMessageContentInput.value;
+		var messageType = 0; // 默认为文本消息
 
-		if (groupMessageContent && toGroupId) {
-			var groupMessage = {
-				cmd: 4,
-				info: {
-					cmd: 4,
-					data: groupMessageContent,
-					sendResult: true,
-					senderId: userId,
-					groupId: toGroupId,
-				}
+		// 检查是否上传了图片
+		if (groupImageInput.files.length > 0) {
+			var groupImageFile = groupImageInput.files[0];
+			var reader = new FileReader();
+
+			reader.onloadend = function () {
+				// 图片转换为Base64编码
+				var groupImageData = reader.result.split(',')[1]; // 去掉前缀部分
+				messageType = 1; // 设置为图片消息
+				sendGroupMessageContent(toGroupId, groupMessageContent, messageType, groupImageData);
 			};
-			send(JSON.stringify(groupMessage));
 
-			toGroupIdInput.value = "";
-			groupMessageContentInput.value = "";
+			reader.readAsDataURL(groupImageFile);
 		} else {
-			alert("群聊消息内容不能为空，或未选择群聊对象");
+			// 没有上传图片，发送文本消息
+			sendGroupMessageContent(toGroupId, groupMessageContent, messageType);
 		}
+
+		// 清空输入框
+		toGroupIdInput.value = "";
+		groupMessageContentInput.value = "";
+		groupImageInput.value = "";
+	}
+
+	function sendGroupMessageContent(toGroupId, groupMessageContent, messageType, groupImageData) {
+		// 构建消息对象
+		var groupMessage = {
+			cmd: 4,  // 使用4表示群聊消息
+			info: {
+				cmd: 4,
+				data: groupMessageContent,
+				sendResult: true,
+				senderId: userId,
+				groupId: toGroupId,
+				messageType: messageType,
+			}
+		};
+
+		// 根据消息类型设置 data 字段
+		if (messageType === 0) {
+			// 文本消息
+			groupMessage.info.data = groupMessageContent;
+		} else if (messageType === 1) {
+			// 图片消息
+			groupMessage.info.data = groupImageData;
+		}
+
+		// 发送消息
+		send(JSON.stringify(groupMessage));
 	}
 
 	function sendSystemMessage() {
@@ -242,12 +307,30 @@
 				// cmd值为1时，不展示
 				break;
 			case 3:
-				// cmd值为3时，字体颜色为红色
-				ta.innerHTML += '<span style="color: red;">[' + formattedTime + '] ' + data + '</span><br>';
+				// cmd值为3时，私聊消息
+				var messageContent = messageObj.info.data;
+				var messageType = messageObj.info.messageType;
+				if (messageType === 0) {
+					// 文本消息
+					ta.innerHTML += '<span style="color: red;">[' + formattedTime + '] ' + data + '</span><br>';
+				} else if (messageType === 1) {
+					// 图片消息
+					ta.innerHTML += '<span style="color: red;">[' + formattedTime + '] ' + data + '</span><br>';
+					ta.innerHTML += '[' + formattedTime + '] <img src="' + messageContent + '" style="max-width: 300px; max-height: 200px;"><br>';
+				}
 				break;
 			case 4:
 				// cmd值为4时，字体颜色为绿色
-				ta.innerHTML += '<span style="color: green;">[' + formattedTime + '] ' + data + '</span><br>';
+				var messageContent = messageObj.info.data;
+				var messageType = messageObj.info.messageType;
+				if (messageType === 0) {
+					// 文本消息
+					ta.innerHTML += '<span style="color: green;">[' + formattedTime + '] ' + data + '</span><br>';
+				} else if (messageType === 1) {
+					// 图片消息
+					ta.innerHTML += '<span style="color: green;">[' + formattedTime + '] ' + data + '</span><br>';
+					ta.innerHTML += '[' + formattedTime + '] <img src="' + messageContent + '" style="max-width: 300px; max-height: 200px;"><br>';
+				}
 				break;
 			case 5:
 				// cmd值为5时，字体颜色为蓝色
@@ -266,6 +349,7 @@
 	<h3>WebSocket 聊天室：</h3>
 	<div id="responseText" style="width: 800px; height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;"></div>
 	<br>
+	<input type="file" name="imageInput" accept="image/*">
 	<input type="text" name="toUserId" style="width: 150px" placeholder="消息接收人id">
 	<input type="text" name="messageContent" style="width: 300px" placeholder="输入私聊消息...">
 	<input type="button" value="发送私聊消息" onclick="
@@ -273,6 +357,7 @@
         messageContent = this.form.messageContent.value;
         sendPrivateMessage()">
 	<br>
+	<input type="file" name="groupImageInput" accept="image/*">
 	<input type="text" name="toGroupId" style="width: 150px" placeholder="消息群组id">
 	<input type="text" name="groupMessageContent" style="width: 300px" placeholder="输入群聊消息...">
 	<input type="button" value="发送群聊消息" onclick="

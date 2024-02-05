@@ -12,19 +12,27 @@ import lyzzcw.work.common.rocketmq.domain.MQConstants;
 import lyzzcw.work.common.rocketmq.domain.MessageInfo;
 import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.ProducerManager;
+import lyzzcw.work.component.common.file.FileUtil;
 import lyzzcw.work.component.common.id.SnowflakeIdWorker;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
+import lyzzcw.work.component.common.utils.EncryptUtil;
+import lyzzcw.work.component.minio.oss.template.MinioTemplate;
 import lyzzcw.work.component.redis.cache.distribute.redis.RedisDistributeCacheService;
 import lyzzcw.work.component.redis.cache.redis.list.RedisListService;
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
+import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.ImageInfo;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -45,13 +53,14 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     private MessageQueueProducer persistenceProducer;
     @Resource
     private RedisListService redisListService;
+    @Resource
+    private MinioTemplate minioTemplate;
 
     @Override
     public void process(PrivateMessage data) {
         log.info("received private message:{}",data);
         //生成唯一消息码
-        Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode);
+        this.handleMessage(data);
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
@@ -75,11 +84,32 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
 
     }
 
+    private void handleMessage(PrivateMessage data) {
+        //生成唯一消息码
+        Long messageCode = SnowflakeIdWorker.generateId();
+        data.setMessageCode(messageCode);
+        //处理文件格式消息
+        if(data.getMessageType() == MessageType.IMAGE.code()){
+            byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
+            try(InputStream inputStream = new ByteArrayInputStream(decodedBytes);
+                InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
+                ImageInfo imageInfo = Imaging.getImageInfo(inputStream, null);
+                // 获取图片格式信息
+                ImageFormat imageFormat = imageInfo.getFormat();
+                String url = minioTemplate.upload("zim",
+                        "/private/"+messageCode+"."+imageFormat.getName(),uploadStream);
+                data.setData(url);
+            }catch (IOException | ImageReadException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public ImMessage persistenceData(PrivateMessage privateMessage) {
         ImMessage imMessage = new ImMessage();
         imMessage.setContent(privateMessage.getData().toString());
-        imMessage.setMessageType(MessageType.TEXT.code());
+        imMessage.setMessageType(privateMessage.getMessageType());
         imMessage.setRecvId(privateMessage.getReceiveId());
         imMessage.setSendId(privateMessage.getSenderId());
         imMessage.setStatus(MessageStatus.SENDED.code());

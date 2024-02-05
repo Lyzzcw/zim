@@ -3,6 +3,7 @@ package lyzzcw.work.common.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lyzzcw.work.common.enums.MessageType;
 
 /**
  * @author lzy
@@ -23,6 +24,11 @@ public abstract class AbstractMessage {
      * 消息码
      */
     private Long messageCode;
+
+    /**
+     * 消息类型 默认为文字
+     */
+    private Integer messageType = MessageType.TEXT.code();
 
     /**
      * 推送消息的数据

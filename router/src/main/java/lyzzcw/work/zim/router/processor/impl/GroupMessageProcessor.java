@@ -16,6 +16,8 @@ import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.ProducerManager;
 import lyzzcw.work.component.common.id.SnowflakeIdWorker;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
+import lyzzcw.work.component.common.utils.EncryptUtil;
+import lyzzcw.work.component.minio.oss.template.MinioTemplate;
 import lyzzcw.work.component.redis.cache.distribute.redis.RedisDistributeCacheService;
 import lyzzcw.work.component.redis.cache.redis.list.RedisListService;
 import lyzzcw.work.zim.router.infrastructure.entity.ImGroupMember;
@@ -23,6 +25,10 @@ import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
 import lyzzcw.work.zim.router.infrastructure.mapper.ImGroupMemberMapper;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
+import org.apache.commons.imaging.ImageFormat;
+import org.apache.commons.imaging.ImageInfo;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +37,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +64,13 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
     private RedisListService redisListService;
     @Resource
     private ImGroupMemberMapper imGroupMemberMapper;
+    @Resource
+    private MinioTemplate minioTemplate;
 
     @Override
     public void process(GroupMessage data) {
         log.info("received group message:{}",data);
-        //生成唯一消息码
-        Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode);
+        this.handleMessage(data);
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
@@ -95,11 +104,37 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
 
     }
 
+    /**
+     * 处理消息
+     *
+     * @param data 数据
+     */
+    private void handleMessage(GroupMessage data) {
+        //生成唯一消息码
+        Long messageCode = SnowflakeIdWorker.generateId();
+        data.setMessageCode(messageCode);
+        //处理文件格式消息
+        if(data.getMessageType() == MessageType.IMAGE.code()){
+            byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
+            try(InputStream inputStream = new ByteArrayInputStream(decodedBytes);
+                InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
+                ImageInfo imageInfo = Imaging.getImageInfo(inputStream, null);
+                // 获取图片格式信息
+                ImageFormat imageFormat = imageInfo.getFormat();
+                String url = minioTemplate.upload("zim",
+                        "/group/"+messageCode+"."+imageFormat.getName(),uploadStream);
+                data.setData(url);
+            }catch (IOException | ImageReadException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public ImMessage persistenceData(GroupMessage groupMessage) {
         ImMessage imMessage = new ImMessage();
         imMessage.setContent(groupMessage.getData().toString());
-        imMessage.setMessageType(MessageType.TEXT.code());
+        imMessage.setMessageType(groupMessage.getMessageType());
         imMessage.setRecvId(groupMessage.getGroupId());
         imMessage.setSendId(groupMessage.getSenderId());
         imMessage.setStatus(MessageStatus.SENDED.code());
@@ -132,4 +167,6 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
                 .build();
         return mutualInfo;
     }
+
+
 }
