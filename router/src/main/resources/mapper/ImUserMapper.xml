@@ -24,7 +24,7 @@
     from im_user
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from im_user
     where id = #{id,jdbcType=BIGINT}
   </delete>
@@ -161,4 +161,14 @@
       created_time = #{createdTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByList" resultType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    select
+    <include refid="Base_Column_List" />
+    from im_user
+    WHERE id IN
+    <foreach collection="ids" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

@@ -8,7 +8,7 @@ import lyzzcw.work.zim.router.infrastructure.entity.ImGroup;
 public interface ImGroupMapper {
     int deleteByPrimaryKey(Long id);
 
-    int insert(ImGroup record);
+    Long insert(ImGroup record);
 
     int insertSelective(ImGroup record);
 

@@ -22,4 +22,6 @@ public interface ImGroupMemberMapper {
     int updateByPrimaryKey(ImGroupMember record);
 
     List<ImGroupMember> findGroupMembersByGroupId(@Param("groupId") Long groupId);
+
+    int batchInsert(@Param("list") List<ImGroupMember> list);
 }

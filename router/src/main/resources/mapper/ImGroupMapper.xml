@@ -25,12 +25,12 @@
     delete from im_group
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
-    insert into im_group (id, name, owner_id, 
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImGroup">
+    insert into im_group (name, owner_id,
       head_image, head_image_thumb, notice, 
       remark, deleted, created_time
       )
-    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{ownerId,jdbcType=BIGINT}, 
+    values (#{name,jdbcType=VARCHAR}, #{ownerId,jdbcType=BIGINT},
       #{headImage,jdbcType=VARCHAR}, #{headImageThumb,jdbcType=VARCHAR}, #{notice,jdbcType=VARCHAR}, 
       #{remark,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT}, #{createdTime,jdbcType=TIMESTAMP}
       )
