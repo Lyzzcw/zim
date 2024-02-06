@@ -135,6 +135,15 @@
     where group_id = #{groupId}
 
   </select>
+  <select id="findGroupMemberByGroupIdAndUserId"
+          resultType="lyzzcw.work.zim.router.infrastructure.entity.ImGroupMember">
+    select
+        *
+    from im_group_member
+    where group_id = #{groupId}
+    and user_id = #{userId}
+    limit 1
+  </select>
 
   <insert id="batchInsert">
     insert into im_group_member (group_id, user_id,

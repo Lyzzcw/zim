@@ -1,6 +1,9 @@
 package lyzzcw.work.zim.router.infrastructure.mapper;
 
+import lyzzcw.work.zim.router.api.domain.dto.MessageDTO;
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
+
+import java.util.List;
 
 /**
 * Created by Mybatis Generator on 2024/02/01
@@ -19,4 +22,6 @@ public interface ImMessageMapper {
     int updateByPrimaryKeyWithBLOBs(ImMessage record);
 
     int updateByPrimaryKey(ImMessage record);
+
+    List<ImMessage> page(MessageDTO messageDTO);
 }

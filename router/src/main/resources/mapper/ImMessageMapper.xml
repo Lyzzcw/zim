@@ -31,7 +31,7 @@
     from im_message
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from im_message
     where id = #{id,jdbcType=BIGINT}
   </delete>
@@ -181,4 +181,30 @@
       send_time = #{sendTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="page" resultType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    select * from im_message
+    <where>
+      <if test="cmdType != null">
+        AND cmd_type = #{cmdType,jdbcType=TINYINT}
+      </if>
+      <if test="sendId != null">
+        AND send_id = #{sendId,jdbcType=BIGINT}
+      </if>
+      <if test="recvId != null">
+        AND recv_id = #{recvId,jdbcType=BIGINT}
+      </if>
+      <if test="messageType != null">
+        AND message_type = #{messageType,jdbcType=TINYINT}
+      </if>
+      <if test="beginTime != null">
+        AND send_time <![CDATA[ >= ]]> #{beginTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endTime != null">
+        AND send_time <![CDATA[ <= ]]> #{endTime,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+
+  </select>
+
 </mapper>

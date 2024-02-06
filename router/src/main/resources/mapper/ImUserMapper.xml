@@ -28,12 +28,12 @@
     delete from im_user
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
-    insert into im_user (id, user_name, nick_name, 
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    insert into im_user (user_name, nick_name,
       head_image, head_image_thumb, password, 
       sex, type, signature, 
       last_login_time, created_time)
-    values (#{id,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
+    values (#{userName,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR},
       #{headImage,jdbcType=VARCHAR}, #{headImageThumb,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
       #{sex,jdbcType=TINYINT}, #{type,jdbcType=SMALLINT}, #{signature,jdbcType=VARCHAR}, 
       #{lastLoginTime,jdbcType=TIMESTAMP}, #{createdTime,jdbcType=TIMESTAMP})
@@ -170,5 +170,11 @@
     <foreach collection="ids" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
+  </select>
+  <select id="selectByUserName" resultType="lyzzcw.work.zim.router.infrastructure.entity.ImUser">
+    select
+    <include refid="Base_Column_List" />
+    from im_user
+    WHERE user_name = #{userName}
   </select>
 </mapper>

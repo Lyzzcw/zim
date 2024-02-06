@@ -1,5 +1,7 @@
 package lyzzcw.work.zim.router.api.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.component.domain.common.entity.Result;
 import lyzzcw.work.zim.router.api.service.LoginService;
@@ -20,12 +22,14 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("system")
 @Slf4j
+@Api("系统管理")
 public class SystemController {
 
     @Resource
     private SystemService systemService;
 
     @GetMapping("notice")
+    @ApiOperation("系统通知")
     public Result<Boolean> notice(@RequestParam("userId") Long userId,
                                  @RequestParam("message") String message){
         return Result.ok(systemService.notice(userId, message));

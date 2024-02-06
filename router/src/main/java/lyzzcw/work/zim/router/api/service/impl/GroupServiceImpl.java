@@ -11,6 +11,7 @@ import lyzzcw.work.zim.router.infrastructure.mapper.ImGroupMemberMapper;
 import lyzzcw.work.zim.router.infrastructure.mapper.ImUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -61,6 +62,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void inviteGroupMember(GroupDTO groupDTO) {
+        ImGroupMember exist = imGroupMemberMapper.findGroupMemberByGroupIdAndUserId(
+                groupDTO.getId(),groupDTO.getInvitees().get(0)
+        );
+        Assert.isNull(exist,"user already in group");
         ImUser user = imUserMapper.selectByPrimaryKey(groupDTO.getInvitees().get(0));
         ImGroupMember imGroupMember = new ImGroupMember();
         imGroupMember.setUserId(user.getId());

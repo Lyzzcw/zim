@@ -61,26 +61,6 @@ CREATE TABLE `im_group_member`
 ) CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '群成员';
 
 -- ----------------------------
--- Table structure for im_group_message
--- ----------------------------
-DROP TABLE IF EXISTS `im_group_message`;
-CREATE TABLE `im_group_message`
-(
-    `id`             bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `message_code`   bigint(20) NOT NULL COMMENT '消息码',
-    `group_id`       bigint(20) NOT NULL COMMENT '群id',
-    `send_id`        bigint(20) NOT NULL COMMENT '发送用户id',
-    `send_nick_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '发送用户昵称',
-    `content`        text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '发送内容',
-    `type`           tinyint(1) NOT NULL COMMENT '消息类型 0:文字 1:图片 2:文件 3:语音',
-    `status`         tinyint(1) NULL DEFAULT 0 COMMENT '状态 0:正常  2:撤回',
-    `send_time`      datetime(0) NULL DEFAULT NULL COMMENT '发送时间',
-    PRIMARY KEY (`id`) USING BTREE,
-    INDEX            `idx_group_id`(`group_id`) USING BTREE,
-    INDEX            `idx_message_code`(`message_code`) USING BTREE
-) CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '群消息';
-
--- ----------------------------
 -- Table structure for im_message
 -- ----------------------------
 DROP TABLE IF EXISTS `im_message`;

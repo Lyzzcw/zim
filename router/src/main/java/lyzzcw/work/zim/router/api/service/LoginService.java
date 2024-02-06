@@ -1,5 +1,8 @@
 package lyzzcw.work.zim.router.api.service;
 
+import lyzzcw.work.zim.router.api.domain.dto.UserDTO;
+import lyzzcw.work.zim.router.infrastructure.entity.ImUser;
+
 /**
  * @author lzy
  * @version 1.0
@@ -8,4 +11,6 @@ package lyzzcw.work.zim.router.api.service;
  */
 public interface LoginService {
     String discovery();
+
+    ImUser register(UserDTO userDTO);
 }

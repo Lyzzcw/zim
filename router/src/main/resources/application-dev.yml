@@ -10,6 +10,10 @@ logging:
   config: classpath:logback-spring.xml
 
 spring:
+  # swagger3.0 与 srpring boot 2.6.x 冲突启动失败问题
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   main:
     allow-circular-references: true
   datasource:

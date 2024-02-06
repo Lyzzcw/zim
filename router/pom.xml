@@ -211,6 +211,14 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--minio -end-->
+
+        <!--swagger -begin-->
+        <dependency>
+            <groupId>lyzzcw.work.component</groupId>
+            <artifactId>swagger-parents</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--swagger -end-->
     </dependencies>
 
 </project>

@@ -1,11 +1,13 @@
 package lyzzcw.work.zim.router.api.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.component.domain.common.entity.Result;
+import lyzzcw.work.zim.router.api.domain.dto.UserDTO;
 import lyzzcw.work.zim.router.api.service.LoginService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lyzzcw.work.zim.router.infrastructure.entity.ImUser;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -18,13 +20,21 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("login")
 @Slf4j
+@Api("登录管理")
 public class LoginController {
 
     @Resource
     private LoginService loginService;
 
     @GetMapping("discovery")
+    @ApiOperation("服务发现")
     public Result<String> discovery(){
         return Result.ok(loginService.discovery(),"success");
+    }
+
+    @PostMapping("register")
+    @ApiOperation("注册")
+    public Result<ImUser> register(@RequestBody UserDTO userDTO){
+        return Result.ok(loginService.register(userDTO));
     }
 }

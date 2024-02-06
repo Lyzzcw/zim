@@ -22,4 +22,6 @@ public interface ImUserMapper {
     int updateByPrimaryKey(ImUser record);
 
     List<ImUser> selectByList(@Param("ids") List<Long> ids);
+
+    ImUser selectByUserName(@Param("userName") String userName);
 }
