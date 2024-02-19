@@ -1,6 +1,8 @@
 package lyzzcw.work.zim.router;
 
+import cn.hutool.core.codec.Base64;
 import lombok.extern.slf4j.Slf4j;
+import lyzzcw.work.component.common.file.FileTypeUtils;
 import lyzzcw.work.component.common.file.FileUtil;
 import lyzzcw.work.component.common.utils.EncryptUtil;
 import lyzzcw.work.component.minio.oss.config.MinioConfig;
@@ -17,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author lzy
@@ -35,7 +39,7 @@ public class RouterTest {
     @Resource
     private MinioTemplate minioTemplate;
     @Test
-    public void upload() throws FileNotFoundException {
+    public void uploadImage() throws FileNotFoundException {
         String base64 = FileUtil.image_to_base64("C:/Users/84428/Desktop/icon.jpg");
         byte[] decodedBytes = EncryptUtil.base64_decode(base64);
         try(InputStream inputStream = new ByteArrayInputStream(decodedBytes);
@@ -50,4 +54,20 @@ public class RouterTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void uploadFile() throws FileNotFoundException {
+        String base64 = FileUtil.image_to_base64("C:/Users/84428/Desktop/hk.pdf");
+        byte[] decodedBytes = EncryptUtil.base64_decode(base64);
+        String type = FileTypeUtils.getFileTypeByBytes(decodedBytes);
+        System.out.println(type);
+        try(InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
+            String url = minioTemplate.upload("zim",
+                    "/private/"+System.currentTimeMillis()+"."+type,uploadStream);
+            System.out.println(url);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

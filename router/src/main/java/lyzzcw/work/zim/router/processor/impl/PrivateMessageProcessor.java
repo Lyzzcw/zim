@@ -1,6 +1,7 @@
 package lyzzcw.work.zim.router.processor.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.constants.IMConstants;
 import lyzzcw.work.common.domain.MutualInfo;
@@ -12,6 +13,7 @@ import lyzzcw.work.common.rocketmq.domain.MQConstants;
 import lyzzcw.work.common.rocketmq.domain.MessageInfo;
 import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.ProducerManager;
+import lyzzcw.work.component.common.file.FileTypeUtils;
 import lyzzcw.work.component.common.file.FileUtil;
 import lyzzcw.work.component.common.id.SnowflakeIdWorker;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
@@ -88,7 +90,7 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
         data.setMessageCode(messageCode);
-        //处理文件格式消息
+        //处理图片格式消息
         if(data.getMessageType() == MessageType.IMAGE.code()){
             byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
             try(InputStream inputStream = new ByteArrayInputStream(decodedBytes);
@@ -100,6 +102,18 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
                         "/private/"+messageCode+"."+imageFormat.getName(),uploadStream);
                 data.setData(url);
             }catch (IOException | ImageReadException e) {
+                e.printStackTrace();
+            }
+        }
+        //处理文件格式消息
+        if(data.getMessageType() == MessageType.FILE.code()){
+            byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
+            String type = FileTypeUtils.getFileTypeByBytes(decodedBytes);
+            try(InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
+                String url = minioTemplate.upload("zim",
+                        "/private/"+messageCode+"."+type,uploadStream);
+                data.setData(url);
+            }catch (IOException e) {
                 e.printStackTrace();
             }
         }
