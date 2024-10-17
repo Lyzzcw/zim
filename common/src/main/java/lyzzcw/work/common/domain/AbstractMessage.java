@@ -23,7 +23,7 @@ public abstract class AbstractMessage {
     /**
      * 消息码
      */
-    private Long messageCode;
+    private String messageCode;
 
     /**
      * 消息类型 默认为文字

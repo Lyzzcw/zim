@@ -31,6 +31,9 @@ public class ProcessorFactory {
             //系统消息
             case SYSTEM_MESSAGE:
                 return SpringContextHolder.getApplicationContext().getBean(SystemMessageProcessor.class);
+            //站内信
+            case INSIDE_MESSAGE:
+                return SpringContextHolder.getApplicationContext().getBean(InsideMessageProcessor.class);
             default:
                 return null;
 

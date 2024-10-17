@@ -9,5 +9,19 @@ import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
  * Description: No Description
  */
 public interface ImMessageService {
+
+    /**
+     * 消息入库
+     *
+     * @param imMessage IM 消息
+     * @return {@link Integer}
+     */
     Integer persistent(ImMessage imMessage);
+
+    /**
+     * 通过代码更新消息
+     *
+     * @param imMessage IM 消息
+     */
+    void updateMessageByCode(ImMessage imMessage);
 }

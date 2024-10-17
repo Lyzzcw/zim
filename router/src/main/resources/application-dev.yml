@@ -2,7 +2,7 @@ server:
   port: 8090
   servlet:
     context-path: /router
-
+    # swagger : http://127.0.0.1:8090/router/swagger-ui/index.html
 #LOG
 log:
   level: INFO
@@ -66,7 +66,7 @@ distribute:
     semaphore: redisson
 
 rocketmq:
-  namesvr: 192.168.3.48:9876
+  namesvr: 127.0.0.1:9876
 mybatis:
   #  classpath:/com/*/*/mapper/*Mapper.xml 放在resources目录下classpath:/mapper/**.xml
   mapper-locations: classpath:/mapper/**.xml

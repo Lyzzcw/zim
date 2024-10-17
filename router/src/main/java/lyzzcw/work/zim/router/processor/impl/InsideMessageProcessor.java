@@ -3,7 +3,9 @@ package lyzzcw.work.zim.router.processor.impl;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.constants.IMConstants;
+import lyzzcw.work.common.domain.InsideMessage;
 import lyzzcw.work.common.domain.MutualInfo;
+import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.domain.SystemMessage;
 import lyzzcw.work.common.enums.IMCmdType;
 import lyzzcw.work.common.enums.MessageStatus;
@@ -19,6 +21,7 @@ import lyzzcw.work.component.redis.cache.redis.list.RedisListService;
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
+import lyzzcw.work.zim.router.service.ImMessageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,14 +32,14 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * 私聊消息处理器
+ * 站内信处理器
  *
  * @author lzy
  * @date 2023/12/21
  */
 @Component
 @Slf4j
-public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
+public class InsideMessageProcessor implements MessageProcessor<InsideMessage> {
 
     @Resource
     private RedisDistributeCacheService distributeCacheService;
@@ -45,10 +48,19 @@ public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
     private MessageQueueProducer persistenceProducer;
     @Resource
     private RedisListService redisListService;
+    @Resource
+    private ImMessageService imMessageService;
 
     @Override
-    public void process(SystemMessage data) {
-        log.info("received system message:{}",data);
+    public void process(InsideMessage data) {
+        log.info("received inside message:{}",data);
+        if(data.getMessageType().equals(MessageType.READED.code())){
+            ImMessage updateMessage = new ImMessage();
+            updateMessage.setMessageCode(Long.parseLong(data.getMessageCode()));
+            updateMessage.setStatus(MessageStatus.READED.code());
+            imMessageService.updateMessageByCode(updateMessage);
+            return;
+        }
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
         data.setMessageCode(messageCode+"");
@@ -76,21 +88,21 @@ public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
     }
 
     @Override
-    public ImMessage persistenceData(SystemMessage SystemMessage) {
+    public ImMessage persistenceData(InsideMessage insideMessage) {
         ImMessage imMessage = new ImMessage();
-        imMessage.setContent(SystemMessage.getData().toString());
+        imMessage.setContent(insideMessage.getData().toString());
         imMessage.setMessageType(MessageType.TEXT.code());
-        imMessage.setRecvId(SystemMessage.getReceiveId());
-        imMessage.setSendId(SystemMessage.getReceiveId());
+        imMessage.setRecvId(insideMessage.getReceiveId());
+        imMessage.setSendId(insideMessage.getReceiveId());
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
-        imMessage.setCmdType(IMCmdType.SYSTEM_MESSAGE.code());
-        imMessage.setMessageCode(Long.parseLong(SystemMessage.getMessageCode()));
+        imMessage.setCmdType(IMCmdType.INSIDE_MESSAGE.code());
+        imMessage.setMessageCode(Long.parseLong(insideMessage.getMessageCode()));
         return imMessage;
     }
 
-    private MessageInfo getMessageInfo(SystemMessage data,String serverId) {
-        MutualInfo<SystemMessage> mutualInfo = getMutualInfo(data);
+    private MessageInfo getMessageInfo(InsideMessage data,String serverId) {
+        MutualInfo<InsideMessage> mutualInfo = getMutualInfo(data);
         MessageInfo messageInfo = new MessageInfo.Builder()
                 .topic(MQConstants.MESSAGE_FROM_ROUTE_TOPIC.concat(serverId))
                 .body(JacksonUtil.to(mutualInfo))
@@ -98,12 +110,18 @@ public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
         return messageInfo;
     }
 
-    private MutualInfo<SystemMessage> getMutualInfo(SystemMessage data) {
-        MutualInfo<SystemMessage> mutualInfo = new MutualInfo.Builder<SystemMessage>()
-                .cmd(IMCmdType.SYSTEM_MESSAGE.code())
+    private MutualInfo<InsideMessage> getMutualInfo(InsideMessage data) {
+        MutualInfo<InsideMessage> mutualInfo = new MutualInfo.Builder<InsideMessage>()
+                .cmd(IMCmdType.INSIDE_MESSAGE.code())
                 .info(data)
                 .build();
         return mutualInfo;
     }
 
+    @Override
+    public InsideMessage transform(Object obj) {
+        if(obj instanceof InsideMessage) return (InsideMessage)obj;
+        Map<?, ?> map = (Map<?, ?>) obj;
+        return BeanUtil.fillBeanWithMap(map, new InsideMessage(), false);
+    }
 }

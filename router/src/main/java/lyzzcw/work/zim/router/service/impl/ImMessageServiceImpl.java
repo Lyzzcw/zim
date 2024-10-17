@@ -22,4 +22,10 @@ public class ImMessageServiceImpl implements ImMessageService {
     public Integer persistent(ImMessage imMessage) {
         return imMessageMapper.insert(imMessage);
     }
+
+    @Override
+    public void updateMessageByCode(ImMessage imMessage) {
+        imMessageMapper.updateMessageByCode(imMessage);
+    }
+
 }

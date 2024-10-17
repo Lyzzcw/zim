@@ -181,6 +181,39 @@
       send_time = #{sendTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateMessageByCode" parameterType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
+    update im_message
+    <set>
+      <if test="cmdType != null">
+        cmd_type = #{cmdType,jdbcType=TINYINT},
+      </if>
+      <if test="sendId != null">
+        send_id = #{sendId,jdbcType=BIGINT},
+      </if>
+      <if test="recvId != null">
+        recv_id = #{recvId,jdbcType=BIGINT},
+      </if>
+      <if test="messageType != null">
+        message_type = #{messageType,jdbcType=TINYINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="sendNickName != null">
+        send_nick_name = #{sendNickName,jdbcType=VARCHAR},
+      </if>
+      <if test="atUserIds != null">
+        at_user_ids = #{atUserIds,jdbcType=VARCHAR},
+      </if>
+      <if test="sendTime != null">
+        send_time = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where message_code = #{messageCode,jdbcType=BIGINT}
+  </update>
 
   <select id="page" resultType="lyzzcw.work.zim.router.infrastructure.entity.ImMessage">
     select * from im_message

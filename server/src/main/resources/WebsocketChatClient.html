@@ -282,6 +282,68 @@
 		}
 	}
 
+	function sendMailMessage() {
+		var mailToUserIdInput = document.getElementsByName("mailToUserId")[0];
+		var mailMessageContentInput = document.getElementsByName("mailMessageContent")[0];
+
+		var toUserId = mailToUserIdInput.value;
+		var messageContent = mailMessageContentInput.value;
+
+		if (messageContent && toUserId) {
+			// 将参数添加到URL
+			var apiUrl = 'http://127.0.0.1:8090/router/inside/send' +
+					'?userId=' + toUserId +
+					'&message=' + messageContent;
+
+			// 使用fetch发送GET请求
+			fetch(apiUrl, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+					.then(response => {
+						if (!response.ok) {
+							throw new Error('HTTP请求失败');
+						}
+						return response.json();
+					})
+					.then(data => {
+						// 处理服务器返回的数据
+						console.log('成功发送站内信:', data);
+						alert("站内信发送成功");
+					})
+					.catch(error => {
+						console.error('发送站内信时发生错误:', error);
+						alert("发送站内信失败");
+					});
+
+			// 清空输入框
+			mailToUserIdInput.value = "";
+			mailMessageContentInput.value = "";
+		} else {
+			alert("站内信内容不能为空，或未选择接收人");
+		}
+	}
+
+	// 发送已读回执的函数
+	function sendReadReceipt(messageCode) {
+		// 构造已读回执消息
+		var readReceiptMessage = {
+			cmd: 6,  // 使用6表示站内信消息
+			info: {
+				cmd: 6,
+				data: "已读回执",
+				senderId: userId,
+				messageCode: messageCode,  // 发送原消息的 messageId
+				messageType: 11             // 表示消息已读
+			}
+		};
+
+		// 发送回执消息
+		send(JSON.stringify(readReceiptMessage));
+	}
+
 	function getCurrentFormattedTime() {
 		var currentTime = new Date();
 		var year = currentTime.getFullYear();
@@ -336,6 +398,14 @@
 				// cmd值为5时，字体颜色为蓝色
 				ta.innerHTML += '<span style="color: blue;">[' + formattedTime + '] ' + data + '</span><br>';
 				break;
+			case 6:
+				// cmd值为6时，站内信消息，字体颜色为橙色
+				// 站内信消息，带"已读"按钮
+				var messageContent = messageObj.info.data;
+				var messageCode = messageObj.info.messageCode; // 假设站内信有 messageId
+				ta.innerHTML += '<span style="color: orange;">[' + formattedTime + '] 站内信: ' + messageContent + '</span> ';
+				ta.innerHTML += '<button onclick="sendReadReceipt(\'' + messageCode + '\')">已读</button><br>';
+				break;
 			default:
 				// 其他情况正常展示
 				ta.innerHTML += '[' + formattedTime + '] ' + data + '<br>';
@@ -369,6 +439,11 @@
 	<input type="text" name="systemToUserId" style="width: 150px" placeholder="接收人userId">
 	<input type="text" name="systemMessageContent" style="width: 300px" placeholder="输入系统消息...">
 	<input type="button" value="发送系统消息" onclick="sendSystemMessage()">
+	<br>
+	<!-- 站内信输入框和发送按钮 -->
+	<input type="text" name="mailToUserId" style="width: 150px" placeholder="接收人userId">
+	<input type="text" name="mailMessageContent" style="width: 300px" placeholder="输入站内信内容...">
+	<input type="button" value="发送站内信" onclick="sendMailMessage()">
 	<br>
 	<input type="button" onclick="document.getElementById('responseText').innerHTML=''" value="清空聊天记录">
 </form>

@@ -89,7 +89,7 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     private void handleMessage(PrivateMessage data) {
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode);
+        data.setMessageCode(messageCode+"");
         //处理图片格式消息
         if(data.getMessageType() == MessageType.IMAGE.code()){
             byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
@@ -129,7 +129,7 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
         imMessage.setCmdType(IMCmdType.PRIVATE_MESSAGE.code());
-        imMessage.setMessageCode(privateMessage.getMessageCode());
+        imMessage.setMessageCode(Long.parseLong(privateMessage.getMessageCode()));
         return imMessage;
     }
 

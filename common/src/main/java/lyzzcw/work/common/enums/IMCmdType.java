@@ -27,7 +27,8 @@ public enum IMCmdType {
     FORCE_LOGUT(2,"强制下线"),
     PRIVATE_MESSAGE(3,"私聊消息"),
     GROUP_MESSAGE(4,"群发消息"),
-    SYSTEM_MESSAGE(5,"系统消息");
+    SYSTEM_MESSAGE(5,"系统消息"),
+    INSIDE_MESSAGE(6,"站内信");
 
 
     private final Integer code;

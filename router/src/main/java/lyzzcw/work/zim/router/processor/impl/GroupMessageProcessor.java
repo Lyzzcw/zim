@@ -112,7 +112,7 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
     private void handleMessage(GroupMessage data) {
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode);
+        data.setMessageCode(messageCode+"");
         //处理图片格式消息
         if(data.getMessageType() == MessageType.IMAGE.code()){
             byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
@@ -152,7 +152,7 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
         imMessage.setCmdType(IMCmdType.GROUP_MESSAGE.code());
-        imMessage.setMessageCode(groupMessage.getMessageCode());
+        imMessage.setMessageCode(Long.parseLong(groupMessage.getMessageCode()));
         return imMessage;
     }
 

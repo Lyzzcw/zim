@@ -3,10 +3,7 @@ package lyzzcw.work.zim.router.processor.factory;
 
 import lyzzcw.work.common.enums.IMCmdType;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
-import lyzzcw.work.zim.router.processor.impl.GroupMessageProcessor;
-import lyzzcw.work.zim.router.processor.impl.LoginProcessor;
-import lyzzcw.work.zim.router.processor.impl.PrivateMessageProcessor;
-import lyzzcw.work.zim.router.processor.impl.SystemMessageProcessor;
+import lyzzcw.work.zim.router.processor.impl.*;
 import lyzzcw.work.zim.router.util.SpringContextHolder;
 
 
@@ -32,6 +29,9 @@ public class ProcessorFactory {
             //系统消息
             case SYSTEM_MESSAGE:
                 return SpringContextHolder.getApplicationContext().getBean(SystemMessageProcessor.class);
+            //站内信
+            case INSIDE_MESSAGE:
+                return SpringContextHolder.getApplicationContext().getBean(InsideMessageProcessor.class);
             default:
                 return null;
 

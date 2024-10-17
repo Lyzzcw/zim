@@ -24,4 +24,6 @@ public interface ImMessageMapper {
     int updateByPrimaryKey(ImMessage record);
 
     List<ImMessage> page(MessageDTO messageDTO);
+
+    void updateMessageByCode(ImMessage record);
 }

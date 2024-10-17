@@ -46,4 +46,4 @@ websocket:
     count: 10
 
 rocketmq:
-  namesvr: 192.168.3.48:9876
+  namesvr: 127.0.0.1:9876
