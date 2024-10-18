@@ -40,9 +40,9 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         MessageInfo messageInfo = getMessageInfo(data);
         messageQueueProducer.sendOrderMessage(messageInfo,data.getReceiveId().toString());
         //返回客户端发送结果
-        if(data.getSendResult()){
-            responseWS(ctx,data);
-        }
+//        if(data.getSendResult()){
+//            responseWS(ctx,data);
+//        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.constants.IMConstants;
+import lyzzcw.work.common.domain.GroupMessage;
 import lyzzcw.work.common.domain.MutualInfo;
 import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.enums.IMCmdType;
@@ -31,6 +32,7 @@ import org.apache.commons.imaging.Imaging;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -48,6 +50,7 @@ import java.util.Map;
 @Slf4j
 public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage> {
 
+    static BeanCopier copier = BeanCopier.create(PrivateMessage.class, PrivateMessage.class, false);
     @Resource
     private RedisDistributeCacheService distributeCacheService;
     @Autowired
@@ -66,6 +69,26 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
+        //回推给发送者消息
+        if(data.getSendResult()){
+            PrivateMessage result = new PrivateMessage();
+            this.copy(data,result);
+            result.setReceiveId(result.getSenderId());
+            String redisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
+                    IMConstants.IM_USER_SERVER_ID, result.getReceiveId().toString());
+            String serverId = distributeCacheService.get(redisKey);
+            if(!StringUtils.isEmpty(serverId) && ProducerManager.getInstance().contains(serverId)){
+                MessageQueueProducer producer = ProducerManager.getInstance()
+                        .getServerProducer(serverId);
+                //暂不需要保证有序，离线不做处理
+                producer.sendMessage(getMessageInfo(result,serverId));
+            }
+        }
+        //发送给接收人
+        forwardToReceiver(data);
+    }
+
+    private void forwardToReceiver(PrivateMessage data) {
         //找到接收者所在的server id
         //记录用户的channelId
         String redisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
@@ -74,16 +97,14 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
         if(!StringUtils.isEmpty(serverId) && ProducerManager.getInstance().contains(serverId)){
             MessageQueueProducer producer = ProducerManager.getInstance()
                     .getServerProducer(serverId);
-
-            producer.sendOrderMessage(getMessageInfo(data,serverId),data.getReceiveId().toString());
+            producer.sendOrderMessage(getMessageInfo(data,serverId), data.getReceiveId().toString());
         }else{
             //消息逻辑
-            log.info("private message receiver offLine:{}",data.getReceiveId());
+            log.info("private message receiver offLine:{}", data.getReceiveId());
             String offLineRedisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
                     IMConstants.IM_USER_OFFLINE_MESSAGE, data.getReceiveId().toString());
             redisListService.leftPush(offLineRedisKey,JacksonUtil.to(getMutualInfo(data)));
         }
-
     }
 
     private void handleMessage(PrivateMessage data) {
@@ -154,5 +175,10 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     public PrivateMessage transform(Object obj) {
         Map<?, ?> map = (Map<?, ?>) obj;
         return BeanUtil.fillBeanWithMap(map, new PrivateMessage(), false);
+    }
+
+    @Override
+    public void copy(PrivateMessage source, PrivateMessage target) {
+        copier.copy(source, target, null);
     }
 }

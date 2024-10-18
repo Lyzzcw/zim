@@ -3,6 +3,7 @@ package lyzzcw.work.zim.server.processor;
 import io.netty.channel.ChannelHandlerContext;
 import lyzzcw.work.common.domain.AbstractMessage;
 import lyzzcw.work.common.domain.MutualInfo;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 消息处理器
@@ -29,5 +30,9 @@ public interface MessageProcessor<T> {
 
     default void sendToReceiver(T info){
 
+    }
+
+    default void copy(T source, T target) {
+        BeanUtils.copyProperties(source, target);
     }
 }

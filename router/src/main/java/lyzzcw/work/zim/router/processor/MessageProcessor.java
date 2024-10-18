@@ -1,6 +1,8 @@
 package lyzzcw.work.zim.router.processor;
 
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
+import org.springframework.beans.BeanUtils;
+
 
 /**
  * 消息处理器
@@ -21,5 +23,9 @@ public interface MessageProcessor<T> {
         return (T)obj;
     }
 
-     ImMessage persistenceData(T t);
+    ImMessage persistenceData(T t);
+
+    default void copy(T source, T target) {
+        BeanUtils.copyProperties(source, target);
+    }
 }

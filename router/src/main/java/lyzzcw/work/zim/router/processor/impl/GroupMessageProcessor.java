@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.constants.IMConstants;
 import lyzzcw.work.common.domain.GroupMessage;
 import lyzzcw.work.common.domain.MutualInfo;
+import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.enums.IMCmdType;
 import lyzzcw.work.common.enums.MessageStatus;
 import lyzzcw.work.common.enums.MessageType;
@@ -32,6 +33,7 @@ import org.apache.commons.imaging.Imaging;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -54,6 +56,8 @@ import java.util.Map;
 @Component
 @Slf4j
 public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
+
+    static BeanCopier copier = BeanCopier.create(GroupMessage.class, GroupMessage.class, false);
 
     @Resource
     private RedisDistributeCacheService distributeCacheService;
@@ -78,30 +82,47 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
         List<ImGroupMember> members = imGroupMemberMapper.findGroupMembersByGroupId(data.getGroupId());
         Assert.isTrue(!CollectionUtils.isEmpty(members),
                 "group : " + data.getGroupId() + " has no members");
-
         members.forEach(member -> {
             if(member.getUserId().equals(data.getSenderId())){
-                //发送者不转发，server直接返回发送结果
+                if(data.getSendResult()){
+                    GroupMessage result = new GroupMessage();
+                    this.copy(data,result);
+                    result.setReceiveId(result.getSenderId());
+                    String redisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
+                            IMConstants.IM_USER_SERVER_ID, result.getReceiveId().toString());
+                    String serverId = distributeCacheService.get(redisKey);
+                    if(!StringUtils.isEmpty(serverId) && ProducerManager.getInstance().contains(serverId)){
+                        MessageQueueProducer producer = ProducerManager.getInstance()
+                                .getServerProducer(serverId);
+                        producer.sendMessage(getMessageInfo(result,serverId));
+                    }
+                }
+                //发送者且不需要转发，server直接返回发送结果
                 return;
             }
             data.setReceiveId(member.getUserId());
-            //记录用户的channelId
-            String redisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
-                    IMConstants.IM_USER_SERVER_ID, data.getReceiveId().toString());
-            String serverId = distributeCacheService.get(redisKey);
-            if(!StringUtils.isEmpty(serverId) && ProducerManager.getInstance().contains(serverId)){
-                MessageQueueProducer producer = ProducerManager.getInstance()
-                        .getServerProducer(serverId);
-                producer.sendOrderMessage(getMessageInfo(data,serverId),data.getReceiveId().toString());
-            }else{
-                //离线消息逻辑
-                log.info("group message receiver offLine:{}",data.getReceiveId());
-                String offLineRedisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
-                        IMConstants.IM_USER_OFFLINE_MESSAGE, data.getReceiveId().toString());
-                redisListService.leftPush(offLineRedisKey,JacksonUtil.to(getMutualInfo(data)));
-            }
+            //转发其他群成员
+            forwardToReceiver(data);
         });
 
+    }
+
+    private void forwardToReceiver(GroupMessage data) {
+        //记录用户的channelId
+        String redisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
+                IMConstants.IM_USER_SERVER_ID, data.getReceiveId().toString());
+        String serverId = distributeCacheService.get(redisKey);
+        if(!StringUtils.isEmpty(serverId) && ProducerManager.getInstance().contains(serverId)){
+            MessageQueueProducer producer = ProducerManager.getInstance()
+                    .getServerProducer(serverId);
+            producer.sendOrderMessage(getMessageInfo(data,serverId), data.getReceiveId().toString());
+        }else{
+            //离线消息逻辑
+            log.info("group message receiver offLine:{}", data.getReceiveId());
+            String offLineRedisKey = String.join(IMConstants.REDIS_KEY_SPLIT,
+                    IMConstants.IM_USER_OFFLINE_MESSAGE, data.getReceiveId().toString());
+            redisListService.leftPush(offLineRedisKey,JacksonUtil.to(getMutualInfo(data)));
+        }
     }
 
     /**
@@ -161,6 +182,11 @@ public class GroupMessageProcessor implements MessageProcessor<GroupMessage> {
     public GroupMessage transform(Object obj) {
         Map<?, ?> map = (Map<?, ?>) obj;
         return BeanUtil.fillBeanWithMap(map, new GroupMessage(), false);
+    }
+
+    @Override
+    public void copy(GroupMessage source, GroupMessage target) {
+        copier.copy(source, target, null);
     }
 
     private MessageInfo getMessageInfo(GroupMessage data, String serverId) {
