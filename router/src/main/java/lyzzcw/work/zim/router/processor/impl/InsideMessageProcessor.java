@@ -56,14 +56,14 @@ public class InsideMessageProcessor implements MessageProcessor<InsideMessage> {
         log.info("received inside message:{}",data);
         if(data.getMessageType().equals(MessageType.READED.code())){
             ImMessage updateMessage = new ImMessage();
-            updateMessage.setMessageCode(Long.parseLong(data.getMessageCode()));
+            updateMessage.setMessageCode(data.getMessageCode());
             updateMessage.setStatus(MessageStatus.READED.code());
             imMessageService.updateMessageByCode(updateMessage);
             return;
         }
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode+"");
+        data.setMessageCode(messageCode);
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
@@ -97,7 +97,7 @@ public class InsideMessageProcessor implements MessageProcessor<InsideMessage> {
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
         imMessage.setCmdType(IMCmdType.INSIDE_MESSAGE.code());
-        imMessage.setMessageCode(Long.parseLong(insideMessage.getMessageCode()));
+        imMessage.setMessageCode(insideMessage.getMessageCode());
         return imMessage;
     }
 

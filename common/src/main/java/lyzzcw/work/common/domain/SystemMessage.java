@@ -20,4 +20,10 @@ public class SystemMessage extends AbstractMessage{
      */
     private Long receiveId;
 
+    @Override
+    public String toString() {
+        return "SystemMessage{" +
+                "receiveId=" + receiveId +
+                "} " + super.toString();
+    }
 }

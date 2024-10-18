@@ -38,7 +38,7 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
         log.info("received login message:{}",data);
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode+"");
+        data.setMessageCode(messageCode);
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
@@ -54,7 +54,7 @@ public class LoginProcessor implements MessageProcessor<LoginMessage> {
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
         imMessage.setCmdType(IMCmdType.LOGIN.code());
-        imMessage.setMessageCode(Long.parseLong(loginMessage.getMessageCode()));
+        imMessage.setMessageCode(loginMessage.getMessageCode());
         return imMessage;
     }
 

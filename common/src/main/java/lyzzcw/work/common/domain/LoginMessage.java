@@ -61,4 +61,11 @@ public class LoginMessage extends AbstractMessage{
             return new LoginMessage(this);
         }
     }
+
+    @Override
+    public String toString() {
+        return "LoginMessage{" +
+                "userId=" + userId +
+                "} " + super.toString();
+    }
 }

@@ -20,4 +20,10 @@ public class InsideMessage extends AbstractMessage{
      */
     private Long receiveId;
 
+    @Override
+    public String toString() {
+        return "InsideMessage{" +
+                "receiveId=" + receiveId +
+                "} " + super.toString();
+    }
 }

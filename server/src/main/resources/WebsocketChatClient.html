@@ -402,7 +402,7 @@
 				// cmd值为6时，站内信消息，字体颜色为橙色
 				// 站内信消息，带"已读"按钮
 				var messageContent = messageObj.info.data;
-				var messageCode = messageObj.info.messageCode; // 假设站内信有 messageId
+				let messageCode = BigInt(messageObj.info.messageCode); // 假设站内信有 messageId
 				ta.innerHTML += '<span style="color: orange;">[' + formattedTime + '] 站内信: ' + messageContent + '</span> ';
 				ta.innerHTML += '<button onclick="sendReadReceipt(\'' + messageCode + '\')">已读</button><br>';
 				break;

@@ -29,4 +29,13 @@ public class GroupMessage extends AbstractMessage{
      * 接收群消息的用户
      */
     private Long receiveId;
+
+    @Override
+    public String toString() {
+        return "GroupMessage{" +
+                "groupId=" + groupId +
+                ", senderId=" + senderId +
+                ", receiveId=" + receiveId +
+                "} " + super.toString();
+    }
 }

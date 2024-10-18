@@ -24,4 +24,11 @@ public class PrivateMessage extends AbstractMessage{
      */
     private Long receiveId;
 
+    @Override
+    public String toString() {
+        return "PrivateMessage{" +
+                "senderId=" + senderId +
+                ", receiveId=" + receiveId +
+                "} " + super.toString();
+    }
 }

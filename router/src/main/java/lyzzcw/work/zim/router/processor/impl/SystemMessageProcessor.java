@@ -51,7 +51,7 @@ public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
         log.info("received system message:{}",data);
         //生成唯一消息码
         Long messageCode = SnowflakeIdWorker.generateId();
-        data.setMessageCode(messageCode+"");
+        data.setMessageCode(messageCode);
         //放入持久化队列
         persistenceProducer.sendMessage(RocketMQUtil.buildPersistenceMessage(
                 JacksonUtil.to(this.persistenceData(data))));
@@ -85,7 +85,7 @@ public class SystemMessageProcessor implements MessageProcessor<SystemMessage> {
         imMessage.setStatus(MessageStatus.SENDED.code());
         imMessage.setSendTime(LocalDateTime.now());
         imMessage.setCmdType(IMCmdType.SYSTEM_MESSAGE.code());
-        imMessage.setMessageCode(Long.parseLong(SystemMessage.getMessageCode()));
+        imMessage.setMessageCode(SystemMessage.getMessageCode());
         return imMessage;
     }
 
