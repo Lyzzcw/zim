@@ -1,10 +1,8 @@
 package lyzzcw.work.zim.router.processor.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.file.FileNameUtil;
 import lombok.extern.slf4j.Slf4j;
 import lyzzcw.work.common.constants.IMConstants;
-import lyzzcw.work.common.domain.GroupMessage;
 import lyzzcw.work.common.domain.MutualInfo;
 import lyzzcw.work.common.domain.PrivateMessage;
 import lyzzcw.work.common.enums.IMCmdType;
@@ -14,14 +12,13 @@ import lyzzcw.work.common.rocketmq.domain.MQConstants;
 import lyzzcw.work.common.rocketmq.domain.MessageInfo;
 import lyzzcw.work.common.rocketmq.service.MessageQueueProducer;
 import lyzzcw.work.common.rocketmq.service.ProducerManager;
-import lyzzcw.work.component.common.file.FileTypeUtils;
-import lyzzcw.work.component.common.file.FileUtil;
 import lyzzcw.work.component.common.id.SnowflakeIdWorker;
 import lyzzcw.work.component.common.json.jackson.JacksonUtil;
 import lyzzcw.work.component.common.utils.EncryptUtil;
 import lyzzcw.work.component.minio.oss.template.MinioTemplate;
 import lyzzcw.work.component.redis.cache.distribute.redis.RedisDistributeCacheService;
 import lyzzcw.work.component.redis.cache.redis.list.RedisListService;
+import lyzzcw.work.zim.router.config.FileUploadConfig;
 import lyzzcw.work.zim.router.infrastructure.entity.ImMessage;
 import lyzzcw.work.zim.router.processor.MessageProcessor;
 import lyzzcw.work.zim.router.rocketmq.RocketMQUtil;
@@ -60,6 +57,8 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
     private RedisListService redisListService;
     @Resource
     private MinioTemplate minioTemplate;
+    @Resource
+    private FileUploadConfig fileUploadConfig;
 
     @Override
     public void process(PrivateMessage data) {
@@ -119,25 +118,25 @@ public class PrivateMessageProcessor implements MessageProcessor<PrivateMessage>
                 ImageInfo imageInfo = Imaging.getImageInfo(inputStream, null);
                 // 获取图片格式信息
                 ImageFormat imageFormat = imageInfo.getFormat();
-                String url = minioTemplate.upload("zim",
-                        "/private/"+messageCode+"."+imageFormat.getName(),uploadStream);
+                String url = minioTemplate.upload(fileUploadConfig.getBucket(),
+                        fileUploadConfig.getPrivateImage()+messageCode+"."+imageFormat.getName(),uploadStream);
                 data.setData(url);
             }catch (IOException | ImageReadException e) {
                 e.printStackTrace();
             }
         }
         //处理文件格式消息
-        if(data.getMessageType() == MessageType.FILE.code()){
-            byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
-            String type = FileTypeUtils.getFileTypeByBytes(decodedBytes);
-            try(InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
-                String url = minioTemplate.upload("zim",
-                        "/private/"+messageCode+"."+type,uploadStream);
-                data.setData(url);
-            }catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        if(data.getMessageType() == MessageType.FILE.code()){
+//            byte[] decodedBytes = EncryptUtil.base64_decode((String)data.getData());
+//            String type = FileTypeUtils.getFileTypeByBytes(decodedBytes);
+//            try(InputStream uploadStream = new ByteArrayInputStream(decodedBytes)){
+//                String url = minioTemplate.upload("zim",
+//                        "/private/"+messageCode+"."+type,uploadStream);
+//                data.setData(url);
+//            }catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override

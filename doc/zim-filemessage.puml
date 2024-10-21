@@ -1,0 +1,15 @@
+@startuml
+title zim-文件消息时序图
+
+actor Sender as sender
+participant "Server" as server
+participant "Router" as router
+actor Receiver as receiver
+
+autonumber
+sender->router:调用http-api上传文件
+router-->sender:文件上传成功后返回文件url等信息
+sender->server:根据回调信息组装消息发送
+ref over sender,router:消息处理
+server->receiver:接收到文件类型消息
+@enduml

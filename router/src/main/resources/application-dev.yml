@@ -48,11 +48,17 @@ spring:
         min-idle: 0
         max-wait: 5000
   minio:
-    endpoint: http://192.168.3.48:9000
-    visitPath: http://192.168.3.48:9000
+    endpoint: http://127.0.0.1:9000
+    visitPath: http://127.0.0.1:9000
     accessKey: lyzzcw
     secretKey: lyzzcw123
     region: acer-win
+upload:
+  bucket: lzy-im
+  groupFile: /group/file/
+  groupImage: /group/image/
+  privateFile: /private/file/
+  privateImage: /private/image/
 cache:
   type:
     local: guava
